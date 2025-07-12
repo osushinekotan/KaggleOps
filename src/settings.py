@@ -1,15 +1,10 @@
+import os
 from pathlib import Path
 
-import rootutils
 from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-ROOT_DIR = rootutils.setup_root(".", indicator="pyproject.toml", cwd=True, dotenv=True)
-DATA_DIR = Path(ROOT_DIR) / "data"
-INPUT_DIR = DATA_DIR / "input"
-OUTPUT_DIR = DATA_DIR / "output"
-
-CODES_DIR = ROOT_DIR / "codes"
+CODES_DIR = "./codes"
 DEPS_CODE_DIR = CODES_DIR / "deps"
 SUBMISSION_CODE_DIR = CODES_DIR / "submission"
 
@@ -23,6 +18,7 @@ class KaggleSettings(BaseSettings):
     KAGGLE_KEY: str = Field(...)
     KAGGLE_COMPETITION_NAME: str = Field(...)
 
+    BASE_ARTIFACTS_NAME: str = Field("", description="Base name for Kaggle artifacts.")
     BASE_ARTIFACTS_HANDLE: str = Field("", description="Base handle for Kaggle artifacts.")
     CODES_HANDLE: str = Field("", description="Handle for Kaggle codes.")
 
@@ -32,7 +28,9 @@ class KaggleSettings(BaseSettings):
     @model_validator(mode="after")
     def set_handles(self):
         self.CODES_HANDLE = f"{self.KAGGLE_USERNAME}/{self.KAGGLE_COMPETITION_NAME}-codes"
-        self.BASE_ARTIFACTS_HANDLE = f"{self.KAGGLE_USERNAME}/{self.KAGGLE_COMPETITION_NAME}-artifacts/other"
+
+        self.BASE_ARTIFACTS_NAME = f"{self.KAGGLE_COMPETITION_NAME}-artifacts/other"
+        self.BASE_ARTIFACTS_HANDLE = f"{self.KAGGLE_USERNAME}/{self.BASE_ARTIFACTS_NAME}"
         return self
 
     @model_validator(mode="after")
@@ -46,3 +44,62 @@ class KaggleSettings(BaseSettings):
         env_file_encoding="utf-8",
         extra="ignore",
     )
+
+
+class LocalDirectorySettings(BaseSettings):
+    ROOT_DIR: str = Field(".", description="Root directory of the project.")
+    INPUT_DIR: str = Field("./data/input", description="Input directory for Kaggle datasets.")
+    ARTIFACT_DIR: str = Field("./data/output", description="Output directory for Kaggle artifacts.")
+    OUTPUT_DIR_TEMPLATE: str = Field("./data/output/{exp_name}/1", description="Output directory for Kaggle artifacts.")
+
+
+class KaggleDirectorySettings(BaseSettings):
+    kaggle_settings: KaggleSettings = Field(KaggleSettings(), description="Kaggle settings for the download process.")
+
+    ROOT_DIR: str = Field("/kaggle/working", description="Root directory in Kaggle environment.")
+    INPUT_DIR: str = Field("/kaggle/input", description="Input directory for Kaggle datasets.")
+    ARTIFACT_DIR: str = Field("", description="Output directory for Kaggle artifacts.")
+    OUTPUT_DIR: str = Field("/kaggle/working", description="Output directory for Kaggle artifacts.")
+
+    @model_validator(mode="after")
+    def set_artifact_dir(self):
+        self.ARTIFACT_DIR = f"{self.INPUT_DIR}/{self.kaggle_settings.BASE_ARTIFACTS_NAME.lower()}"
+        return self
+
+
+class DirectorySettings(BaseSettings):
+    """
+    Settings for directory paths in the project.
+    """
+
+    exp_name: str = Field(..., description="Experiment name for the output directory.")
+    env: str | None = Field(None, description="Environment type, either 'local' or 'kaggle'.")
+
+    COMP_DATASET_DIR: str | Path = Field("", description="Directory for Kaggle competition datasets.")
+    ROOT_DIR: str | Path = Field("", description="Root directory of the project.")
+    INPUT_DIR: str | Path = Field("", description="Input directory for datasets.")
+    OUTPUT_DIR: str | Path = Field("", description="Output directory for artifacts.")
+
+    @model_validator(mode="after")
+    def set_directories(self):
+        self.env = "kaggle" if os.getenv("KAGGLE_DATA_PROXY_TOKEN") else "local"
+
+        if self.env == "local":
+            dir_setting = LocalDirectorySettings()
+        elif self.env == "kaggle":
+            dir_setting = KaggleDirectorySettings()
+        else:
+            raise ValueError("Invalid environment type. Must be either 'local' or 'kaggle'.")
+
+        self.ROOT_DIR = Path(dir_setting.ROOT_DIR)
+        self.INPUT_DIR = Path(dir_setting.INPUT_DIR)
+        self.OUTPUT_DIR = (
+            Path(dir_setting.OUTPUT_DIR)
+            if self.env == "kaggle"
+            else Path(dir_setting.OUTPUT_DIR_TEMPLATE.format(exp_name=self.exp_name))
+        )
+        self.ARTIFACT_DIR = Path(dir_setting.ARTIFACT_DIR)
+        self.COMP_DATASET_DIR = Path(self.dir.INPUT_DIR) / self.dir.kaggle_settings.KAGGLE_COMPETITION_NAME
+        self.ARTIFACT_EXP_DIR = self.ARTIFACT_DIR / self.exp_name / "1"
+
+        return self

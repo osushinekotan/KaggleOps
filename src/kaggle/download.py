@@ -6,7 +6,7 @@ from tyro.extras import SubcommandApp
 
 from kaggle import KaggleApi
 
-from ..settings import INPUT_DIR, KaggleSettings
+from ..settings import KaggleSettings, LocalDirectorySettings
 from .utils.customhub import competition_download, datasets_download
 
 logger = logging.getLogger(__name__)
@@ -17,6 +17,7 @@ client = KaggleApi()
 client.authenticate()
 
 app = SubcommandApp()
+local_directory_settings = LocalDirectorySettings()
 
 
 class DownloadCompetitionDatasetSettings(BaseModel):
@@ -53,7 +54,7 @@ def competition_dataset(settings: DownloadCompetitionDatasetSettings) -> None:
     competition_download(
         client=client,
         handle=settings.kaggle_settings.KAGGLE_COMPETITION_NAME,
-        destination=INPUT_DIR,
+        destination=local_directory_settings.INPUT_DIR,
         force_download=settings.force_download,
     )
 
@@ -66,7 +67,7 @@ def datasets(settings: DownloadDatasetsSettings) -> None:
     datasets_download(
         client=client,
         handles=settings.handles,
-        destination=INPUT_DIR,
+        destination=local_directory_settings.INPUT_DIR,
         force_download=settings.force_download,
     )
 

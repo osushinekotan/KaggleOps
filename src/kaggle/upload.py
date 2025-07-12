@@ -6,7 +6,7 @@ from tyro.extras import SubcommandApp
 
 from kaggle import KaggleApi
 
-from ..settings import OUTPUT_DIR, ROOT_DIR, KaggleSettings
+from ..settings import KaggleSettings, LocalDirectorySettings
 from .utils.customhub import dataset_upload, model_upload
 
 logger = logging.getLogger(__name__)
@@ -17,6 +17,7 @@ client = KaggleApi()
 client.authenticate()
 
 app = SubcommandApp()
+local_directory_settings = LocalDirectorySettings()
 
 
 class UploadCodeSettings(BaseModel):
@@ -44,7 +45,7 @@ def codes(settings: UploadCodeSettings) -> None:
     dataset_upload(
         client=client,
         handle=settings.kaggle_settings.CODES_HANDLE,
-        local_dataset_dir=ROOT_DIR,
+        local_dataset_dir=local_directory_settings.ROOT_DIR,
         update=True,
     )
 
@@ -59,7 +60,9 @@ def artifacts(settings: UploadArtifactSettings) -> None:
     model_upload(
         client=client,
         handle=f"{kaggle_settings.BASE_ARTIFACTS_HANDLE}/{exp_name}",
-        local_model_dir=OUTPUT_DIR / str(exp_name) / "1",  # output dir に存在する artifact をアップロード
+        local_model_dir=local_directory_settings.OUTPUT_DIR
+        / str(exp_name)
+        / "1",  # output dir に存在する artifact をアップロード
         update=False,
     )
 
