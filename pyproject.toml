@@ -1,0 +1,90 @@
+[project]
+name = "kaggle-ops"
+version = "0.1.0"
+description = "A Python project"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "kaggle>=1.7.4.5",
+    "kagglehub>=0.3.12",
+    "pydantic>=2.11.7",
+    "pydantic-settings>=2.10.1",
+    "tyro>=0.9.26",
+]
+
+[tool.uv]
+dev-dependencies = [
+    "ipykernel>=6.29.5",
+    "mypy>=1.12.0",
+    "ruff>=0.7.0",
+    "pre-commit>=4.0.1",
+    "rootutils>=1.0.7",
+]
+
+[tool.ruff]
+line-length = 120
+# https://docs.astral.sh/ruff/rules/
+lint.select = [
+    "F", # pyflakes
+    "E", # pycodestyle
+    "W", # pycodestyle warnings
+    "I", # isort
+    # "D", # pydocstyle
+    "B",   # flakes8-bugbear
+    "UP",  # pyupgrade
+    "N",   # pep8-naming
+    "C90", # mccabe
+]
+lint.fixable = ["ALL"]
+lint.unfixable = [
+    "F401", # module imported but unused
+    "F841", # local variable is assigned to but never used
+]
+lint.ignore = [
+    "E501", # line too long
+    "E402", # module level import not at top of file
+    "N806", # variable in function should be lowercase
+    "N803", # argument name should be lowercase
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+
+[tool.mypy]
+# https://caddi.tech/archives/4506
+exclude = ["__init__"]
+python_version = "3.12"
+allow_redefinition = true
+allow_untyped_globals = false
+check_untyped_defs = true
+color_output = true
+disallow_incomplete_defs = true
+disallow_untyped_calls = false
+disallow_untyped_decorators = false
+disallow_untyped_defs = true
+error_summary = true
+ignore_missing_imports = true
+implicit_reexport = true
+namespace_packages = true
+no_implicit_optional = true
+pretty = true
+show_column_numbers = true
+show_error_codes = true
+show_error_context = true
+show_traceback = true
+strict = true
+warn_no_return = true
+warn_redundant_casts = true
+warn_return_any = false
+warn_unreachable = true
+warn_unused_configs = true
+warn_unused_ignores = false
+disallow_any_generics = false
+
+[[tool.mypy.overrides]]
+module = ["tests.*"]
+ignore_errors = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
