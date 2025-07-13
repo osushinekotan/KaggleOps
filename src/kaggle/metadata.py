@@ -1,4 +1,5 @@
 import json
+import logging
 
 from pydantic import BaseModel, Field
 from tyro.extras import SubcommandApp
@@ -6,6 +7,7 @@ from tyro.extras import SubcommandApp
 from ..settings import DEPS_CODE_DIR, SUBMISSION_CODE_DIR, KaggleSettings
 
 app = SubcommandApp()
+logger = logging.getLogger(__name__)
 
 
 class MakeDepsCodeMetadataSettings(BaseModel):
@@ -42,6 +44,7 @@ def deps_code(settings: MakeDepsCodeMetadataSettings) -> None:
     """
     Create metadata for the Kaggle code that installs dependencies.
     """
+    logger.info("Creating metadata for the Kaggle code that installs dependencies...")
     kaggle_settings = settings.kaggle_settings
     metadata = {
         "id": f"{kaggle_settings.KAGGLE_USERNAME}/{kaggle_settings.DEPS_CODE_NAME}",
@@ -62,12 +65,15 @@ def deps_code(settings: MakeDepsCodeMetadataSettings) -> None:
     with open(metadata_path, "w") as f:
         json.dump(metadata, f, indent=2)
 
+    logger.info(json.dumps(metadata, indent=2))
+
 
 @app.command()
 def submission_code(settings: MakeSubmissionCodeMetadataSettings) -> None:
     """
     Create metadata for the Kaggle submission code.
     """
+    logger.info("Creating metadata for the Kaggle submission code...")
     kaggle_settings = settings.kaggle_settings
 
     model_sources = [f"{kaggle_settings.BASE_ARTIFACTS_HANDLE}/{name}/1" for name in settings.model_source_names]
@@ -89,6 +95,8 @@ def submission_code(settings: MakeSubmissionCodeMetadataSettings) -> None:
     metadata_path = SUBMISSION_CODE_DIR / "kernel-metadata.json"
     with open(metadata_path, "w") as f:
         json.dump(metadata, f, indent=2)
+
+    logger.info(json.dumps(metadata, indent=2))
 
 
 if __name__ == "__main__":
