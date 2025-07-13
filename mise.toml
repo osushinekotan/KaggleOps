@@ -23,9 +23,9 @@ run = "uv run python -m src.kaggle.download competition-dataset"
 description = "Upload source code to Kaggle dataset."
 run = "uv run python -m src.kaggle.upload codes"
 
-[tasks.up-af]
+[tasks.up-art]
 description = "Upload artifacts to Kaggle model."
-run = "uv run python -m src.kaggle.upload artiWfacts"
+run = "uv run python -m src.kaggle.upload artifacts"
 
 [tasks.meta-deps]
 description = "Create metadata for Kaggle code that installs dependencies."
