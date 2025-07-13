@@ -60,7 +60,7 @@ def deps_code(settings: MakeDepsCodeMetadataSettings) -> None:
     }
     metadata_path = DEPS_CODE_DIR / "kernel-metadata.json"
     with open(metadata_path, "w") as f:
-        json.dump(metadata, f, indent=4)
+        json.dump(metadata, f, indent=2)
 
 
 @app.command()
@@ -70,7 +70,7 @@ def submission_code(settings: MakeSubmissionCodeMetadataSettings) -> None:
     """
     kaggle_settings = settings.kaggle_settings
 
-    model_sources = [f"{kaggle_settings.BASE_ARTIFACTS_HANDLE}/{name}/1" for name in settings.model]
+    model_sources = [f"{kaggle_settings.BASE_ARTIFACTS_HANDLE}/{name}/1" for name in settings.model_source_names]
     metadata = {
         "id": f"{kaggle_settings.KAGGLE_USERNAME}/{kaggle_settings.SUBMISSION_CODE_NAME}",
         "title": f"{kaggle_settings.SUBMISSION_CODE_NAME}",
@@ -88,7 +88,7 @@ def submission_code(settings: MakeSubmissionCodeMetadataSettings) -> None:
     }
     metadata_path = SUBMISSION_CODE_DIR / "kernel-metadata.json"
     with open(metadata_path, "w") as f:
-        json.dump(metadata, f, indent=4)
+        json.dump(metadata, f, indent=2)
 
 
 if __name__ == "__main__":
