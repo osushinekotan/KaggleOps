@@ -67,11 +67,21 @@ def artifacts(settings: UploadArtifactSettings) -> None:
     )
 
 
+@app.command()
+def sources(settings: UploadArtifactSettings) -> None:
+    """
+    Upload the codes and artifacts to Kaggle.
+    """
+    codes(settings=UploadCodeSettings(kaggle_settings=settings.kaggle_settings))
+    artifacts(settings)
+
+
 if __name__ == "__main__":
     """Run the upload commands.
 
     Help:
     >>> uv run python -m src.kaggle.upload codes -h
     >>> uv run python -m src.kaggle.upload artifacts -h
+    >>> uv run python -m src.kaggle.upload sources -h
     """
     app.cli()

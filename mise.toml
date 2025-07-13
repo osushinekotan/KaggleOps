@@ -31,9 +31,37 @@ run = "uv run python -m src.kaggle.upload artifacts"
 description = "Create metadata for Kaggle code that installs dependencies."
 run = "uv run python -m src.kaggle.metadata deps-code"
 
+[tasks.up-sourec]
+description = "Upload codes and artifacts to Kaggle."
+run = "uv run python -m src.kaggle.upload sources"
+
 [tasks.meta-sub]
 description = "Create metadata for Kaggle submission code."
 run = "uv run python -m src.kaggle.metadata submission-code"
+
+[tasks.push-deps]
+description = "Push Kaggle code that installs dependencies."
+run = '''
+uv run python -m src.kaggle.metadata deps-cod
+cd codes/deps
+uv run kaggle k push
+cd ../..
+'''
+
+[tasks.push-sub]
+description = "Push Kaggle submission code."
+run = '''
+TARGET_FILE="codes/submission/kernel-metadata.json"
+if [ ! -f "$TARGET_FILE" ]; then
+  echo "Error: File '$TARGET_FILE' does not exist. Please run `mise meta-sub` first."
+  exit 1
+fi
+echo "File exists. Continuing with the rest of the script..."
+cd codes/submission
+uv run kaggle k push
+cd ../..
+'''
+
 
 [tasks.fmt]
 description = "Run pre-commit formatting."
