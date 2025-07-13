@@ -52,18 +52,12 @@ cd ../..
 [tasks.push-sub]
 description = "Push Kaggle submission code."
 run = '''
-TARGET_FILE="codes/submission/kernel-metadata.json"
-if [ ! -f "$TARGET_FILE" ]; then
-  echo "Error: File '$TARGET_FILE' does not exist. Please run `mise meta-sub` first."
-  exit 1
-fi
-echo "File exists. Continuing with the rest of the script..."
+uv run python -m src.kaggle.check nessesary-artifacts-exist
 uv run python -m src.kaggle.upload codes
 cd codes/submission
 uv run kaggle k push
 cd ../..
 '''
-
 
 [tasks.fmt]
 description = "Run pre-commit formatting."
