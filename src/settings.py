@@ -4,7 +4,7 @@ from pathlib import Path
 from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-CODES_DIR = "./codes"
+CODES_DIR = Path("./codes")
 DEPS_CODE_DIR = CODES_DIR / "deps"
 SUBMISSION_CODE_DIR = CODES_DIR / "submission"
 
@@ -54,17 +54,10 @@ class LocalDirectorySettings(BaseSettings):
 
 
 class KaggleDirectorySettings(BaseSettings):
-    kaggle_settings: KaggleSettings = Field(KaggleSettings(), description="Kaggle settings for the download process.")
-
     ROOT_DIR: str = Field("/kaggle/working", description="Root directory in Kaggle environment.")
     INPUT_DIR: str = Field("/kaggle/input", description="Input directory for Kaggle datasets.")
     ARTIFACT_DIR: str = Field("", description="Output directory for Kaggle artifacts.")
     OUTPUT_DIR: str = Field("/kaggle/working", description="Output directory for Kaggle artifacts.")
-
-    @model_validator(mode="after")
-    def set_artifact_dir(self):
-        self.ARTIFACT_DIR = f"{self.INPUT_DIR}/{self.kaggle_settings.BASE_ARTIFACTS_NAME.lower()}"
-        return self
 
 
 class DirectorySettings(BaseSettings):
@@ -74,15 +67,18 @@ class DirectorySettings(BaseSettings):
 
     exp_name: str = Field(..., description="Experiment name for the output directory.")
     env: str | None = Field(None, description="Environment type, either 'local' or 'kaggle'.")
+    kaggle_settings: KaggleSettings = Field(KaggleSettings(), description="Kaggle settings for the download process.")
 
     COMP_DATASET_DIR: str | Path = Field("", description="Directory for Kaggle competition datasets.")
     ROOT_DIR: str | Path = Field("", description="Root directory of the project.")
     INPUT_DIR: str | Path = Field("", description="Input directory for datasets.")
     OUTPUT_DIR: str | Path = Field("", description="Output directory for artifacts.")
+    ARTIFACT_DIR: str | Path = Field("", description="Directory for artifacts.")
+    ARTIFACT_EXP_DIR: str | Path = Field("", description="Directory for experiment artifacts.")
 
     @model_validator(mode="after")
     def set_directories(self):
-        self.env = "kaggle" if os.getenv("KAGGLE_DATA_PROXY_TOKEN") else "local"
+        self.env = self.env or ("kaggle" if os.getenv("KAGGLE_DATA_PROXY_TOKEN") else "local")
 
         if self.env == "local":
             dir_setting = LocalDirectorySettings()
@@ -98,8 +94,16 @@ class DirectorySettings(BaseSettings):
             if self.env == "kaggle"
             else Path(dir_setting.OUTPUT_DIR_TEMPLATE.format(exp_name=self.exp_name))
         )
-        self.ARTIFACT_DIR = Path(dir_setting.ARTIFACT_DIR)
-        self.COMP_DATASET_DIR = Path(self.dir.INPUT_DIR) / self.dir.kaggle_settings.KAGGLE_COMPETITION_NAME
+        self.ARTIFACT_DIR = (
+            Path(dir_setting.ARTIFACT_DIR)
+            if self.env == "local"
+            else Path(f"{dir_setting.INPUT_DIR}/{self.kaggle_settings.BASE_ARTIFACTS_NAME.lower()}")
+        )
+        self.COMP_DATASET_DIR = Path(dir_setting.INPUT_DIR) / self.kaggle_settings.KAGGLE_COMPETITION_NAME
         self.ARTIFACT_EXP_DIR = self.ARTIFACT_DIR / self.exp_name / "1"
 
         return self
+
+
+s = DirectorySettings(exp_name="test")
+print(s.model_dump())
