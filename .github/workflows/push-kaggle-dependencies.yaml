@@ -1,0 +1,39 @@
+name: Push Kaggle Dependencies
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+    paths:
+      - 'codes/deps/code.ipynb'
+  workflow_dispatch:
+
+jobs:
+  push-dependencies:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: ".python-version"
+
+      - name: Install the project
+        run: uv sync --locked --all-extras --dev
+
+      - name: Push Kaggle dependencies code
+        env:
+          KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+          KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+        run: |
+          uv run python -m src.kaggle.write deps-metadata
+          cd codes/deps
+          uv run kaggle k push
+          cd ../..
