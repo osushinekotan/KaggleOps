@@ -103,7 +103,3 @@ class DirectorySettings(BaseSettings):
         self.ARTIFACT_EXP_DIR = self.ARTIFACT_DIR / self.exp_name / "1"
 
         return self
-
-
-s = DirectorySettings(exp_name="test")
-print(s.model_dump())
