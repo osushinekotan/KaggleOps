@@ -1,6 +1,8 @@
 import json
 import logging
 
+import nbformat
+from nbformat.v4 import new_code_cell, new_notebook
 from pydantic import BaseModel, Field
 from tyro.extras import SubcommandApp
 
@@ -37,6 +39,16 @@ class MakeSubmissionCodeMetadataSettings(BaseModel):
     )
 
     dataset_sources: list[str] = Field(default_factory=list, description="List of dataset sources for the Kaggle code.")
+
+
+class MakeSubmissionCodeSettings(BaseModel):
+    """
+    Settings for creating the submission code.
+    """
+
+    kaggle_settings: KaggleSettings = Field(
+        default_factory=KaggleSettings, description="Kaggle settings for the submission code."
+    )
 
 
 @app.command()
@@ -99,11 +111,44 @@ def submission_metadata(settings: MakeSubmissionCodeMetadataSettings) -> None:
     logger.info(json.dumps(metadata, indent=2))
 
 
+@app.command()
+def submission_code(settings: MakeSubmissionCodeSettings) -> None:
+    """
+    Create the submission code notebook.
+    """
+    logger.info("Creating the submission code notebook...")
+    kaggle_settings = settings.kaggle_settings
+
+    install_deps_code = (
+        f"!pip install /kaggle/input/{kaggle_settings.DEPS_CODE_NAME}/*.whl "
+        "--force-reinstall "
+        "--root-user-action ignore "
+        "--no-index "
+        f"--find-links /kaggle/input/{kaggle_settings.DEPS_CODE_NAME}"
+    )
+    run_inference_code = (
+        f"!PYTHONPATH=/kaggle/input/{kaggle_settings.CODES_NAME} "
+        f"python /kaggle/input/{kaggle_settings.CODES_NAME}/src/inference.py"
+    )
+
+    notebook = new_notebook(
+        cells=[
+            new_code_cell(source=install_deps_code),
+            new_code_cell(source=run_inference_code),
+        ]
+    )
+
+    subumission_code_path = SUBMISSION_CODE_DIR / "code.ipynb"
+    with open(subumission_code_path, "w", encoding="utf-8") as f:
+        nbformat.write(notebook, f)
+
+
 if __name__ == "__main__":
     """Run the code metadata creation commands.
 
     Help:
     >>> uv run python -m src.kaggle.write deps-metadata -h
     >>> uv run python -m src.kaggle.write submission-metadata -h
+    >>> uv run python -m src.kaggle.write submission-code -h
     """
     app.cli()
