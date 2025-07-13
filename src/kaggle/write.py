@@ -40,7 +40,7 @@ class MakeSubmissionCodeMetadataSettings(BaseModel):
 
 
 @app.command()
-def deps_code(settings: MakeDepsCodeMetadataSettings) -> None:
+def deps_metadata(settings: MakeDepsCodeMetadataSettings) -> None:
     """
     Create metadata for the Kaggle code that installs dependencies.
     """
@@ -69,7 +69,7 @@ def deps_code(settings: MakeDepsCodeMetadataSettings) -> None:
 
 
 @app.command()
-def submission_code(settings: MakeSubmissionCodeMetadataSettings) -> None:
+def submission_metadata(settings: MakeSubmissionCodeMetadataSettings) -> None:
     """
     Create metadata for the Kaggle submission code.
     """
@@ -103,7 +103,7 @@ if __name__ == "__main__":
     """Run the code metadata creation commands.
 
     Help:
-    >>> uv run python -m src.kaggle.metadata deps-code -h
-    >>> uv run python -m src.kaggle.metadata submission-code -h
+    >>> uv run python -m src.kaggle.write deps-metadata -h
+    >>> uv run python -m src.kaggle.write submission-metadata -h
     """
     app.cli()
