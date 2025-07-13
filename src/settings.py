@@ -20,6 +20,7 @@ class KaggleSettings(BaseSettings):
 
     BASE_ARTIFACTS_NAME: str = Field("", description="Base name for Kaggle artifacts.")
     BASE_ARTIFACTS_HANDLE: str = Field("", description="Base handle for Kaggle artifacts.")
+    CODES_NAME: str = Field("", description="Name of the Kaggle codes.")
     CODES_HANDLE: str = Field("", description="Handle for Kaggle codes.")
 
     DEPS_CODE_NAME: str = Field("", description="Name of the Deps Kaggle code.")
@@ -27,7 +28,8 @@ class KaggleSettings(BaseSettings):
 
     @model_validator(mode="after")
     def set_handles(self):
-        self.CODES_HANDLE = f"{self.KAGGLE_USERNAME}/{self.KAGGLE_COMPETITION_NAME}-codes"
+        self.CODES_NAME = f"{self.KAGGLE_COMPETITION_NAME}-codes"
+        self.CODES_HANDLE = f"{self.KAGGLE_USERNAME}/{self.CODES_NAME}"
 
         self.BASE_ARTIFACTS_NAME = f"{self.KAGGLE_COMPETITION_NAME}-artifacts/other"
         self.BASE_ARTIFACTS_HANDLE = f"{self.KAGGLE_USERNAME}/{self.BASE_ARTIFACTS_NAME}"
