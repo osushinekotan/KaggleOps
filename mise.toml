@@ -58,6 +58,7 @@ if [ ! -f "$TARGET_FILE" ]; then
   exit 1
 fi
 echo "File exists. Continuing with the rest of the script..."
+uv run python -m src.kaggle.upload codes
 cd codes/submission
 uv run kaggle k push
 cd ../..
