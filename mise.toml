@@ -1,0 +1,40 @@
+[tools]
+uv = "latest"
+
+[env]
+_.python.venv = { path = ".venv" }
+_.file = ".env"
+
+[tasks.setup]
+run = '''
+[ -f .env ] || cp .env.example .env
+uv sync
+# uv run pre-commit install
+'''
+
+[tasks.dl-comp]
+description = '''
+Download Kaggle competition dataset.
+Comptition name is set in environment variable KAGGLE_COMPETITION_NAME
+'''
+run = "uv run python -m src.kaggle.download competition-dataset"
+
+[tasks.up-code]
+description = "Upload source code to Kaggle dataset."
+run = "uv run python -m src.kaggle.upload codes"
+
+[tasks.up-af]
+description = "Upload artifacts to Kaggle model."
+run = "uv run python -m src.kaggle.upload artiWfacts"
+
+[tasks.meta-deps]
+description = "Create metadata for Kaggle code that installs dependencies."
+run = "uv run python -m src.kaggle.metadata deps-code"
+
+[tasks.meta-sub]
+description = "Create metadata for Kaggle submission code."
+run = "uv run python -m src.kaggle.metadata submission-code"
+
+[tasks.fmt]
+description = "Run pre-commit formatting."
+run = "uv run pre-commit run --all-files"
