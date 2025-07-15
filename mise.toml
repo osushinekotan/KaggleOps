@@ -8,7 +8,6 @@ PYTHONPATH = "./src"
 
 [tasks.setup]
 run = '''
-[ -f .env ] || cp .env.example .env
 uv sync
 # uv run pre-commit install
 uv run python -m src.kaggle.write submission-code
