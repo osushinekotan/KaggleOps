@@ -31,8 +31,8 @@ jobs:
           KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
           KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
         run: |
-          uv run python -m src.kaggle.check nessesary-artifacts-exist
-          uv run python -m src.kaggle.upload codes
+          uv run python -m src.kaggle_utils.check nessesary-artifacts-exist
+          uv run python -m src.kaggle_utils.upload codes
           cd codes/submission
           uv run kaggle k push
           cd ../..

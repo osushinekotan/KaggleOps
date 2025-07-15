@@ -2,10 +2,9 @@ import json
 import logging
 
 import dotenv
+from kaggle import KaggleApi
 from pydantic import BaseModel, Field
 from tyro.extras import SubcommandApp
-
-from kaggle import KaggleApi
 
 from ..settings import SUBMISSION_CODE_DIR, KaggleSettings, LocalDirectorySettings
 from .utils.customhub import check_if_exist_model_instance
@@ -59,6 +58,6 @@ if __name__ == "__main__":
     """
     Command line interface for checking necessary artifacts for the submission code.
     Example:
-    >>> uv run python -m src.kaggle.check nessesary-artifacts-exist
+    >>> uv run python -m src.kaggle_utils.check nessesary-artifacts-exist
     """
     app.cli()

@@ -1,10 +1,9 @@
 import logging
 
 import dotenv
+from kaggle import KaggleApi
 from pydantic import BaseModel, Field
 from tyro.extras import SubcommandApp
-
-from kaggle import KaggleApi
 
 from ..settings import KaggleSettings, LocalDirectorySettings
 from .utils.customhub import competition_download, datasets_download
@@ -76,7 +75,7 @@ if __name__ == "__main__":
     """Run the command line interface for downloading datasets.
 
     Help:
-    >>> uv run python -m src.kaggle.download competition-dataset -h
-    >>> uv run python -m src.kaggle.download datasets -h
+    >>> uv run python -m src.kaggle_utils.download competition-dataset -h
+    >>> uv run python -m src.kaggle_utils.download datasets -h
     """
     app.cli()

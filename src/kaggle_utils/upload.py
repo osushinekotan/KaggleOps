@@ -1,10 +1,9 @@
 import logging
 
 import dotenv
+from kaggle import KaggleApi
 from pydantic import BaseModel, Field
 from tyro.extras import SubcommandApp
-
-from kaggle import KaggleApi
 
 from ..settings import KaggleSettings, LocalDirectorySettings
 from .utils.customhub import dataset_upload, model_upload
@@ -80,8 +79,8 @@ if __name__ == "__main__":
     """Run the upload commands.
 
     Help:
-    >>> uv run python -m src.kaggle.upload codes -h
-    >>> uv run python -m src.kaggle.upload artifacts -h
-    >>> uv run python -m src.kaggle.upload sources -h
+    >>> uv run python -m src.kaggle_utils.upload codes -h
+    >>> uv run python -m src.kaggle_utils.upload artifacts -h
+    >>> uv run python -m src.kaggle_utils.upload sources -h
     """
     app.cli()

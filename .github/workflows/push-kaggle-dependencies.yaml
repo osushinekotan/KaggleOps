@@ -4,7 +4,7 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
     paths:
-      - 'codes/deps/code.ipynb'
+      - "codes/deps/code.ipynb"
   workflow_dispatch:
 
 jobs:
@@ -33,7 +33,7 @@ jobs:
           KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
           KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
         run: |
-          uv run python -m src.kaggle.write deps-metadata
+          uv run python -m src.kaggle_utils.write deps-metadata
           cd codes/deps
           uv run kaggle k push
           cd ../..
