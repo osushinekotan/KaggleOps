@@ -26,6 +26,9 @@ IGNORE_PATTERNS = [
     "pyproject.toml",
     "uv.lock",
     "catboost_info",
+    "docs",
+    "notebooks",
+    "tests",
 ]
 
 
