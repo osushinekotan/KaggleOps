@@ -12,6 +12,7 @@ uv sync
 # uv run pre-commit install
 uv run python -m src.kaggle_utils.write submission-code
 source .env && ./scripts/scrape_competition.sh
+uv run python -m src.kaggle_utils.download competition-dataset
 '''
 
 [tasks.dl-comp]

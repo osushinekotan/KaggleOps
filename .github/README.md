@@ -19,9 +19,3 @@
    mise trust
    mise run setup
    ```
-
-3. download data
-
-   ```bash
-   mise run dl-comp
-   ```
