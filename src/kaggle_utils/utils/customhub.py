@@ -180,7 +180,7 @@ def model_upload(
         with open(tempdir / "model-metadata.json", "w") as f:
             json.dump(model_metadata, f, indent=4)
 
-        if not check_if_exist_model(handle=model_handle):
+        if not check_if_exist_model(client=client, handle=model_handle):
             client.model_create_new(folder=tempdir)
 
     model_instance_metadata = make_model_instance_metadata(handle=handle)
