@@ -14,9 +14,9 @@ class KaggleSettings(BaseSettings):
     Settings for Kaggle operations.
     """
 
-    KAGGLE_USERNAME: str = Field(...)
-    KAGGLE_KEY: str = Field(...)
-    KAGGLE_COMPETITION_NAME: str = Field(...)
+    KAGGLE_USERNAME: str = Field("")
+    KAGGLE_KEY: str = Field("")
+    KAGGLE_COMPETITION_NAME: str = Field("")
 
     BASE_ARTIFACTS_NAME: str = Field("", description="Base name for Kaggle artifacts.")
     BASE_ARTIFACTS_HANDLE: str = Field("", description="Base handle for Kaggle artifacts.")
