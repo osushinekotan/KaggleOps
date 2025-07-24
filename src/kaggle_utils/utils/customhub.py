@@ -60,7 +60,11 @@ def check_if_exist_model(client: KaggleApi, handle: str) -> bool:
 
 def check_if_exist_model_instance(client: KaggleApi, handle: str) -> bool:
     # handle = <username>/<model_slug>/<framework>/<variation_slug>/
-    assert len(handle.split("/")) == 4, f"Invalid handle: {handle}"
+    if len(handle.split("/")) == 5:
+        # remove version suffix if exists
+        handle = "/".join(handle.split("/")[:-1])
+
+    logger.info(f"Checking model instance existence: {handle}")
 
     try:
         client.model_instance_get(model_instance=handle)
