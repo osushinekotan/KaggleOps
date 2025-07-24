@@ -34,7 +34,7 @@ class CheckNecessaryArtifactsSettings(BaseModel):
 def nessesary_artifacts_exist(settings: CheckNecessaryArtifactsSettings) -> bool:
     """Check if the necessary artifacts for the submission code exist."""
     kaggle_settings = settings.kaggle_settings
-    metadata_path = SUBMISSION_CODE_DIR / "kenel-metadata.json"
+    metadata_path = SUBMISSION_CODE_DIR / "kernel-metadata.json"
     if not metadata_path.exists():
         logger.error(f"Metadata file not found: {metadata_path}")
         return False
