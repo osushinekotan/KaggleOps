@@ -99,7 +99,7 @@ def submission_metadata(settings: MakeSubmissionCodeMetadataSettings) -> None:
         "enable_gpu": "false" if not settings.enable_gpu else "true",
         "enable_tpu": "false" if not settings.enable_tpu else "true",
         "enable_internet": "false",
-        "dataset_sources": settings.dataset_sources,
+        "dataset_sources": sorted(list(set(settings.dataset_sources + [kaggle_settings.CODES_HANDLE]))),
         "competition_sources": [kaggle_settings.KAGGLE_COMPETITION_NAME],
         "kernel_sources": [f"{kaggle_settings.KAGGLE_USERNAME}/{kaggle_settings.DEPS_CODE_NAME}"],
         "model_sources": model_sources,
