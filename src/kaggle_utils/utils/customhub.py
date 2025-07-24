@@ -40,7 +40,7 @@ def existing_dataset(client: KaggleApi) -> list:
 def check_if_exist_dataset(client: KaggleApi, handle: str) -> bool:
     """Check if dataset already exist in kaggle."""
     for ds in existing_dataset(client):
-        if str(ds) == handle:
+        if str(ds.ref) == handle:
             return True
     return False
 
