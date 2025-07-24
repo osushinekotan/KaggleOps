@@ -128,6 +128,7 @@ def submission_code(settings: MakeSubmissionCodeSettings) -> None:
     )
     run_inference_code = (
         f"!PYTHONPATH=/kaggle/input/{kaggle_settings.CODES_NAME} "
+        f"KAGGLE_COMPETITION_NAME={kaggle_settings.KAGGLE_COMPETITION_NAME} "
         f"python /kaggle/input/{kaggle_settings.CODES_NAME}/src/inference.py"
     )
 
