@@ -68,7 +68,7 @@ class DirectorySettings(BaseSettings):
     """
 
     exp_name: str = Field(..., description="Experiment name for the output directory.")
-    env: str | None = Field(None, description="Environment type, either 'local' or 'kaggle'.")
+    run_env: str | None = Field(None, description="Environment type, either 'local' or 'kaggle'.")
     kaggle_settings: KaggleSettings = Field(KaggleSettings(), description="Kaggle settings for the download process.")
 
     COMP_DATASET_DIR: str | Path = Field("", description="Directory for Kaggle competition datasets.")
@@ -80,25 +80,25 @@ class DirectorySettings(BaseSettings):
 
     @model_validator(mode="after")
     def set_directories(self):
-        self.env = self.env or ("kaggle" if os.getenv("KAGGLE_DATA_PROXY_TOKEN") else "local")
+        self.run_env = self.run_env or ("kaggle" if os.getenv("KAGGLE_DATA_PROXY_TOKEN") else "local")
 
-        if self.env == "local":
+        if self.run_env == "local":
             dir_setting = LocalDirectorySettings()
-        elif self.env == "kaggle":
+        elif self.run_env == "kaggle":
             dir_setting = KaggleDirectorySettings()
         else:
-            raise ValueError("Invalid environment type. Must be either 'local' or 'kaggle'.")
+            raise ValueError(f"Invalid environment type. Must be either 'local' or 'kaggle'. Got: {self.run_env}")
 
         self.ROOT_DIR = Path(dir_setting.ROOT_DIR)
         self.INPUT_DIR = Path(dir_setting.INPUT_DIR)
         self.OUTPUT_DIR = (
             Path(dir_setting.OUTPUT_DIR)
-            if self.env == "kaggle"
+            if self.run_env == "kaggle"
             else Path(dir_setting.OUTPUT_DIR_TEMPLATE.format(exp_name=self.exp_name))
         )
         self.ARTIFACT_DIR = (
             Path(dir_setting.ARTIFACT_DIR)
-            if self.env == "local"
+            if self.run_env == "local"
             else Path(f"{dir_setting.INPUT_DIR}/{self.kaggle_settings.BASE_ARTIFACTS_NAME.lower()}")
         )
         self.COMP_DATASET_DIR = Path(dir_setting.INPUT_DIR) / self.kaggle_settings.KAGGLE_COMPETITION_NAME
