@@ -1,4 +1,5 @@
 import logging
+from pathlib import Path
 
 import dotenv
 from kaggle import KaggleApi
@@ -59,7 +60,7 @@ def artifacts(settings: UploadArtifactSettings) -> None:
     model_upload(
         client=client,
         handle=f"{kaggle_settings.BASE_ARTIFACTS_HANDLE}/{exp_name}",
-        local_model_dir=local_directory_settings.OUTPUT_DIR
+        local_model_dir=Path(local_directory_settings.ARTIFACT_DIR)
         / str(exp_name)
         / "1",  # output dir に存在する artifact をアップロード
         update=False,
