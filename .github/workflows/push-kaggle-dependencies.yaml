@@ -32,6 +32,7 @@ jobs:
         env:
           KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
           KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+          KAGGLE_COMPETITION_NAME: ${{ secrets.KAGGLE_COMPETITION_NAME }}
         run: |
           uv run python -m src.kaggle_utils.write deps-metadata
           cd codes/deps
