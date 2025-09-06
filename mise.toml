@@ -27,7 +27,7 @@ run = "uv run python -m src.kaggle_utils.upload codes"
 
 [tasks.up-art]
 description = "Upload artifacts to Kaggle model."
-run = "uv run python -m src.kaggle_utils.upload artifacts"
+run = "uv run python -m src.kaggle_utils.upload artifacts --settings.exp-name"
 
 [tasks.meta-deps]
 description = "Create metadata for Kaggle code that installs dependencies."
@@ -35,7 +35,7 @@ run = "uv run python -m src.kaggle_utils.write deps-metadata"
 
 [tasks.up-source]
 description = "Upload codes and artifacts to Kaggle."
-run = "uv run python -m src.kaggle_utils.upload sources"
+run = "uv run python -m src.kaggle_utils.upload sources --settings.exp-name"
 
 [tasks.meta-sub]
 description = "Create metadata for Kaggle submission code."
