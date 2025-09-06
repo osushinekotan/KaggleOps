@@ -48,7 +48,7 @@ lint.ignore = [
     "N806", # variable in function should be lowercase
     "N803", # argument name should be lowercase
 ]
-exclude = ["docs"]
+exclude = ["src/kaggle_evaluation", "docs"]
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]
