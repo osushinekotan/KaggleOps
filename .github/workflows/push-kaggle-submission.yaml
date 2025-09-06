@@ -34,6 +34,7 @@ jobs:
         run: |
           uv run python -m src.kaggle_utils.check nessesary-artifacts-exist
           uv run python -m src.kaggle_utils.upload codes
+          sleep 30
           cd codes/submission
           uv run kaggle k push
           cd ../..
