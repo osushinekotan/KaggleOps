@@ -38,4 +38,4 @@
 
    - `model_sources` : The source code of the model. (required)
 
-4. create a pull request
+4. create a pull request or `mise run push-sub`
