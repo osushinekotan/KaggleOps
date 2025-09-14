@@ -44,7 +44,6 @@ run = "uv run python -m src.kaggle_utils.write submission-metadata"
 [tasks.push-deps]
 description = "Push Kaggle code that installs dependencies."
 run = '''
-uv run python -m src.kaggle_utils.write deps-metadata
 cd codes/deps
 uv run kaggle k push
 cd ../..
