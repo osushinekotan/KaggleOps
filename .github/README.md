@@ -15,46 +15,46 @@
 2. setup
 
    ```bash
-   mise install
-   mise trust
-   mise run setup
+   uv sync
+   . .venv/bin/activate
+   ```
+
+   ```bash
+   poe setup
    ```
 
 3. download data
 
    ```bash
-   mise run dl-comp
+   poe dl-comp
    ```
 
-4. create metadata
+4. upload deps
 
    ```bash
-   mise run meta-deps
-   mise run meta-sub
-   ```
-
-5. upload deps
-
-   ```bash
-   mise run push-deps
+   poe push-deps
    ```
 
    - above commands (1~4) need to be run only once.
    - commands 5 to be run every time you want to update the dependencies.
 
-6. experiment & create `inference.py`
+5. experiment & create `inference.py`
 
    - edit `model_sources` (`codes/submission/kernel_metadata.json`)
    - uploade artifacts to Kaggle
 
    ```bash
-   mise run up-art {EXPERIMENT_NAME}
+   poe up-art {EXPERIMENT_NAME}
    ```
 
-7. submit to Kaggle
+6. submit to Kaggle
+
+   - update submission metadata (`codes/submission/kernel_metadata.json`)
+     - `model_sources` should be updated.
+     - If you want to enable GPU or TPU, you can set `enable_gpu` or `enable_tpu` to `true`.
 
    ```bash
-   mise run push-sub {EXPERIMENT_NAME}
+   poe push-sub
    ```
 
 ## Options: Auto Submission via GitHub Actions
@@ -68,7 +68,7 @@
 2. push artifacts to Kaggle
 
    ```bash
-   mise run up-art --settings.exp-name {EXPERIMENT_NAME}
+   poe up-art {EXPERIMENT_NAME}
    ```
 
 3. update submission metadata
