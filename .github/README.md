@@ -12,7 +12,9 @@
    - `KAGGLE_KEY` : Your Kaggle API key. (required)
    - `KAGGLE_COMPETITION_NAME` : The name of the Kaggle competition. The name can be found in the `DOWNLOAD DATA` tab. (required)
 
-2. setup
+2. install uv: https://docs.astral.sh/uv/getting-started/installation/
+
+3. setup
 
    ```bash
    uv sync
@@ -23,13 +25,13 @@
    poe setup
    ```
 
-3. download data
+4. download data
 
    ```bash
    poe dl-comp
    ```
 
-4. upload deps
+5. upload deps
 
    ```bash
    poe push-deps
@@ -38,7 +40,7 @@
    - above commands (1~4) need to be run only once.
    - commands 5 to be run every time you want to update the dependencies.
 
-5. experiment & create `inference.py`
+6. experiment & create `inference.py`
 
    - edit `model_sources` (`codes/submission/kernel_metadata.json`)
    - uploade artifacts to Kaggle
@@ -47,7 +49,7 @@
    poe up-art {EXPERIMENT_NAME}
    ```
 
-6. submit to Kaggle
+7. submit to Kaggle
 
    - update submission metadata (`codes/submission/kernel_metadata.json`)
      - `model_sources` should be updated.
