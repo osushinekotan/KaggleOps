@@ -21,6 +21,7 @@ dev-dependencies = [
     "ruff>=0.7.0",
     "pre-commit>=4.0.1",
     "rootutils>=1.0.7",
+    "poethepoet>=0.37.0",
 ]
 
 [tool.ruff]
@@ -91,3 +92,35 @@ ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
+
+[tool.poe]
+envfile = ".env"
+
+[tool.poe.tasks]
+_write_submission_code = "uv run python -m src.kaggle_utils.write submission-code"
+_scrape_competition = "./scripts/scrape_competition.sh"
+_write_sub_meta = "uv run python -m src.kaggle_utils.write submission-metadata"
+_write_deps_meta = "uv run python -m src.kaggle_utils.write deps-metadata"
+
+setup = [
+    "_write_submission_code",
+    "_scrape_competition",
+    "_write_sub_meta",
+    "_write_deps_meta",
+]
+dl-comp = "uv run python -m src.kaggle_utils.download competition-dataset"
+up-art = "uv run python -m src.kaggle_utils.upload artifacts --settings.exp-name"
+
+[tool.poe.tasks.push-deps]
+shell = "cd codes/deps && uv run kaggle k push && cd ../.."
+
+[tool.poe.tasks.push-sub]
+shell = """
+    uv run python -m src.kaggle_utils.check nessesary-artifacts-exist
+    uv run python -m src.kaggle_utils.upload codes
+    echo "Waiting for 30 seconds"
+    sleep 30
+    cd codes/submission
+    uv run kaggle k push
+    cd ../..
+"""
