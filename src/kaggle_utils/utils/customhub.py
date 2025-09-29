@@ -117,7 +117,7 @@ def make_model_metadata(handle: str) -> dict:
     model_metadata["ownerSlug"] = owner_slug
     model_metadata["title"] = model_slug
     model_metadata["slug"] = model_slug
-    model_metadata["isPrivate"] = True
+    model_metadata["isPrivate"] = "true"
     model_metadata["description"] = f"{model_slug} artifacts"
 
     return model_metadata
@@ -180,8 +180,7 @@ def model_upload(
     model_handle = "/".join(handle.split("/")[:2])
     model_metadata = make_model_metadata(handle=model_handle)
     with tempfile.TemporaryDirectory() as tempdir:
-        tempdir = Path(tempdir)
-        with open(tempdir / "model-metadata.json", "w") as f:
+        with open(Path(tempdir) / "model-metadata.json", "w") as f:
             json.dump(model_metadata, f, indent=4)
 
         if not check_if_exist_model(client=client, handle=model_handle):
@@ -195,7 +194,6 @@ def model_upload(
         return
 
     with tempfile.TemporaryDirectory() as tempdir:
-        tempdir = Path(tempdir)
         copytree(
             src=str(local_model_dir),
             dst=str(tempdir),
@@ -203,9 +201,9 @@ def model_upload(
         )
 
         print(f"dst_dir={tempdir}\ntree")
-        display_tree(tempdir)
+        display_tree(Path(tempdir))
 
-        with open(tempdir / "model-instance-metadata.json", "w") as f:
+        with open(Path(tempdir) / "model-instance-metadata.json", "w") as f:
             json.dump(model_instance_metadata, f, indent=4)
 
         if not is_exist_model_instance:

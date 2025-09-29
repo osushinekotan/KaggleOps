@@ -16,7 +16,7 @@ client = KaggleApi()
 client.authenticate()
 
 app = SubcommandApp()
-local_directory_settings = LocalDirectorySettings()
+local_directory_settings = LocalDirectorySettings()  # type: ignore
 
 
 class DownloadCompetitionDatasetSettings(BaseModel):
@@ -25,7 +25,8 @@ class DownloadCompetitionDatasetSettings(BaseModel):
     """
 
     kaggle_settings: KaggleSettings = Field(
-        default_factory=KaggleSettings, description="Kaggle settings for the download process."
+        KaggleSettings(),  # type: ignore
+        description="Kaggle settings for the download process.",
     )
     force_download: bool = Field(False, description="Whether to force download the dataset even if it already exists.")
 
@@ -36,9 +37,10 @@ class DownloadDatasetsSettings(BaseModel):
     """
 
     kaggle_settings: KaggleSettings = Field(
-        default_factory=KaggleSettings, description="Kaggle settings for the download process."
+        KaggleSettings(),  # type: ignore
+        description="Kaggle settings for the download process.",
     )
-    handles: str = Field(..., description="Comma-separated list of Kaggle dataset handles to download.")
+    handles: list[str] = Field(..., description="Comma-separated list of Kaggle dataset handles to download.")
     force_download: bool = Field(
         False, description="Whether to force download the datasets even if they already exist."
     )

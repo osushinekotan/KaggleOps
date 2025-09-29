@@ -18,7 +18,8 @@ class MakeDepsCodeMetadataSettings(BaseModel):
     """
 
     kaggle_settings: KaggleSettings = Field(
-        default_factory=KaggleSettings, description="Kaggle settings for the metadata creation."
+        KaggleSettings(),  # type: ignore
+        description="Kaggle settings for the metadata creation.",
     )
 
 
@@ -28,7 +29,8 @@ class MakeSubmissionCodeMetadataSettings(BaseModel):
     """
 
     kaggle_settings: KaggleSettings = Field(
-        default_factory=KaggleSettings, description="Kaggle settings for the metadata creation."
+        KaggleSettings(),  # type: ignore
+        description="Kaggle settings for the metadata creation.",
     )
 
     enable_gpu: bool = Field(False, description="Whether to enable GPU for the Kaggle code.")
@@ -47,7 +49,8 @@ class MakeSubmissionCodeSettings(BaseModel):
     """
 
     kaggle_settings: KaggleSettings = Field(
-        default_factory=KaggleSettings, description="Kaggle settings for the submission code."
+        KaggleSettings(),  # type: ignore
+        description="Kaggle settings for the submission code.",
     )
 
 

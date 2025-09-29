@@ -17,7 +17,7 @@ client = KaggleApi()
 client.authenticate()
 
 app = SubcommandApp()
-local_directory_settings = LocalDirectorySettings()
+local_directory_settings = LocalDirectorySettings()  # type: ignore
 
 
 class CheckNecessaryArtifactsSettings(BaseModel):
@@ -26,7 +26,8 @@ class CheckNecessaryArtifactsSettings(BaseModel):
     """
 
     kaggle_settings: KaggleSettings = Field(
-        default_factory=KaggleSettings, description="Kaggle settings for the check process."
+        default_factory=lambda: KaggleSettings(),  # type: ignore
+        description="Kaggle settings for the check process.",
     )
 
 

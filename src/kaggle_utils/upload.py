@@ -17,7 +17,7 @@ client = KaggleApi()
 client.authenticate()
 
 app = SubcommandApp()
-local_directory_settings = LocalDirectorySettings()
+local_directory_settings = LocalDirectorySettings()  # type: ignore
 
 
 class UploadCodeSettings(BaseModel):
@@ -25,7 +25,10 @@ class UploadCodeSettings(BaseModel):
     Settings for uploading code to Kaggle.
     """
 
-    kaggle_settings: KaggleSettings = Field(KaggleSettings(), description="Kaggle settings for the upload process.")
+    kaggle_settings: KaggleSettings = Field(
+        KaggleSettings(),  # type: ignore
+        description="Kaggle settings for the upload process.",
+    )
 
 
 class UploadArtifactSettings(BaseModel):
@@ -34,7 +37,10 @@ class UploadArtifactSettings(BaseModel):
     """
 
     exp_name: str = Field(..., description="Experiment name for uploading artifacts.")
-    kaggle_settings: KaggleSettings = Field(KaggleSettings(), description="Kaggle settings for the upload process.")
+    kaggle_settings: KaggleSettings = Field(
+        KaggleSettings(),  # type: ignore
+        description="Kaggle settings for the upload process.",
+    )
 
 
 @app.command()
@@ -60,9 +66,11 @@ def artifacts(settings: UploadArtifactSettings) -> None:
     model_upload(
         client=client,
         handle=f"{kaggle_settings.BASE_ARTIFACTS_HANDLE}/{exp_name}",
-        local_model_dir=Path(local_directory_settings.ARTIFACT_DIR)
-        / str(exp_name)
-        / "1",  # output dir に存在する artifact をアップロード
+        local_model_dir=str(
+            Path(local_directory_settings.ARTIFACT_DIR)
+            / str(exp_name)
+            / "1",  # output dir に存在する artifact をアップロード
+        ),
         update=False,
     )
 
