@@ -126,6 +126,7 @@ def submission_code(settings: MakeSubmissionCodeSettings) -> None:
         f"!pip install /kaggle/input/{kaggle_settings.DEPS_CODE_NAME}/*.whl "
         "--force-reinstall "
         "--root-user-action ignore "
+        "--no-deps "
         "--no-index "
         f"--find-links /kaggle/input/{kaggle_settings.DEPS_CODE_NAME}"
     )
