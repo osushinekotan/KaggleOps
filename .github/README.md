@@ -1,6 +1,6 @@
 # KaggleOps
 
-## Initialize Project
+## Submission Flow
 
 1. write `.env` file
 
