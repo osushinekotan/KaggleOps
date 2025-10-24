@@ -4,7 +4,7 @@ on:
   pull_request:
     types: [opened, synchronize, reopened]
     paths:
-      - "codes/deps/code.ipynb"
+      - "codes/deps/requirements.txt"
   workflow_dispatch:
 
 jobs:
@@ -34,7 +34,10 @@ jobs:
           KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
           KAGGLE_COMPETITION_NAME: ${{ secrets.KAGGLE_COMPETITION_NAME }}
         run: |
-          uv run python -m src.kaggle_utils.write deps-metadata
-          cd codes/deps
-          uv run kaggle k push
-          cd ../..
+          python -m src.kaggle_utils.write deps-metadata
+          python -m src.kaggle_utils.write deps-code
+          if [ ! -f codes/deps/code.ipynb ]; then
+              echo "code.ipynb not found in codes/deps. Skipping push."
+              exit 0
+          fi
+          cd codes/deps && kaggle k push && cd ../..
