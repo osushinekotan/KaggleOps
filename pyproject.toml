@@ -10,6 +10,7 @@ dependencies = [
     "pre-commit>=4.0.1",
     "rootutils>=1.0.7",
     "poethepoet>=0.37.0",
+    "google-cloud-aiplatform>=1.70.0",
 ]
 
 [tool.ruff]
