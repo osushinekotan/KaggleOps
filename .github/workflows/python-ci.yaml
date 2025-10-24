@@ -3,6 +3,7 @@ name: Python CI
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+  workflow_dispatch:
 
 jobs:
   lint-test-and-check:
