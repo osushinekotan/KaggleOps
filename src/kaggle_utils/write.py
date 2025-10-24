@@ -172,7 +172,7 @@ def deps_code() -> None:
             logger.info("Deleted existing code.ipynb")
         return
 
-    with open(requirements_path, "r", encoding="utf-8") as f:
+    with open(requirements_path, encoding="utf-8") as f:
         requirements = [line.strip() for line in f if line.strip() and not line.strip().startswith("#")]
 
     if not requirements:
