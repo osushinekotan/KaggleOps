@@ -112,9 +112,14 @@ def train_fn(
         val_pred_df = pl.concat([val_pred_df, val_df], how="diagonal_relaxed")
 
         # score
-        score = score_fn(config, val_pred_df)
+        score = score_fn(config, val_df)
         scores[fold] = score
         print(f"🏆 Score: {score}\n")
+
+    # overall score
+    overall_score = score_fn(config, val_pred_df)
+    scores["overall"] = overall_score
+    print(f"🏆 Overall score: {overall_score}\n")
 
     return best_models, val_pred_df, scores
 
