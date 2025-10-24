@@ -117,7 +117,7 @@ def make_model_metadata(handle: str) -> dict:
     model_metadata["ownerSlug"] = owner_slug
     model_metadata["title"] = model_slug
     model_metadata["slug"] = model_slug
-    model_metadata["isPrivate"] = True
+    model_metadata["isPrivate"] = True  # type: ignore
     model_metadata["description"] = f"{model_slug} artifacts"
 
     return model_metadata

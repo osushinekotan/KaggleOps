@@ -1,0 +1,43 @@
+{
+  "name": "kaggle-ops",
+  "build": {
+    "dockerfile": "../Dockerfile",
+    "context": ".."
+  },
+  "workspaceFolder": "/workspace",
+  "containerEnv": {
+    "TZ": "Asia/Tokyo"
+  },
+  "remoteEnv": {
+    "PYTHONPATH": "/workspace:${PYTHONPATH}"
+  },
+  "mounts": ["source=.,target=/workspace,type=bind"],
+  "runArgs": ["--shm-size=8gb", "--env-file=.env"],
+  "features": {
+    "ghcr.io/dhoeric/features/google-cloud-cli:1": {}
+  },
+  "hostRequirements": {
+    "gpu": "optional"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "esbenp.prettier-vscode",
+        "ms-python.python",
+        "njpwerner.autodocstring",
+        "KevinRose.vsc-python-indent",
+        "charliermarsh.ruff",
+        "mhutchie.git-graph",
+        "ms-python.mypy-type-checker",
+        "ms-toolsai.jupyter",
+        "janisdd.vscode-edit-csv",
+        "GitHub.copilot",
+        "samuelcolvin.jinjahtml",
+        "ms-azuretools.vscode-docker",
+        "tamasfe.even-better-toml",
+        "openai.chatgpt",
+        "Anthropic.claude-code"
+      ]
+    }
+  }
+}
