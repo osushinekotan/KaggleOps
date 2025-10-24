@@ -164,8 +164,8 @@ def deps_code() -> None:
     # default dependencies (pydantic-settings)
     # If you want to add more dependencies, you can edit `codes/deps/code.ipynb`
     install_deps_code = (
-        "!pip download -d /kaggle/working pydantic-settings>=2.10.1 \n"
-        "!pip install /kaggle/working/*.whl"
+        "!pip download -d /kaggle/working pydantic-settings>=2.10.1\n"
+        "!pip install /kaggle/working/*.whl "
         "--force-reinstall "
         "--root-user-action ignore "
         "--no-deps "
