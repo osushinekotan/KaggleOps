@@ -18,11 +18,6 @@ jobs:
         with:
           enable-cache: true
 
-      - name: Install uv
-        uses: astral-sh/setup-uv@v5
-        with:
-          enable-cache: true
-
       - name: Create virtual environment and install dependencies
         run: |
           uv venv --python 3.11
