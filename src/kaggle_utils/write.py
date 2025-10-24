@@ -161,10 +161,32 @@ def deps_code() -> None:
     """
     logger.info("Creating the deps code notebook...")
 
-    # default dependencies (pydantic-settings)
-    # If you want to add more dependencies, you can edit `codes/deps/code.ipynb`
+    # Read requirements from codes/deps/requirements.txt
+    requirements_path = DEPS_CODE_DIR / "requirements.txt"
+    deps_code_path = DEPS_CODE_DIR / "code.ipynb"
+
+    if not requirements_path.exists():
+        logger.info("requirements.txt not found. Skipping code.ipynb generation.")
+        if deps_code_path.exists():
+            deps_code_path.unlink()
+            logger.info("Deleted existing code.ipynb")
+        return
+
+    with open(requirements_path, "r", encoding="utf-8") as f:
+        requirements = [line.strip() for line in f if line.strip() and not line.strip().startswith("#")]
+
+    if not requirements:
+        logger.info("No requirements found in requirements.txt.")
+        if deps_code_path.exists():
+            deps_code_path.unlink()
+            logger.info("Deleted existing code.ipynb")
+        return
+
+    # Build pip download command for all requirements
+    download_cmd = "!pip download -d /kaggle/working " + " ".join(requirements)
+
     install_deps_code = (
-        "!pip download -d /kaggle/working pydantic-settings>=2.10.1\n"
+        download_cmd + "\n"
         "!pip install /kaggle/working/*.whl "
         "--force-reinstall "
         "--root-user-action ignore "
@@ -181,9 +203,10 @@ def deps_code() -> None:
         "name": "python3",
     }
 
-    deps_code_path = DEPS_CODE_DIR / "code.ipynb"
     with open(deps_code_path, "w", encoding="utf-8") as f:
         nbformat.write(notebook, f)
+
+    logger.info(f"Created deps code notebook with {len(requirements)} requirement(s)")
 
 
 if __name__ == "__main__":
