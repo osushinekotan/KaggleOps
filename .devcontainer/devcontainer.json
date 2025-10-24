@@ -1,0 +1,22 @@
+{
+  "name": "kaggle-ops",
+  "build": {
+    "dockerfile": "../Dockerfile",
+    "context": ".."
+  },
+  "workspaceFolder": "/workspace",
+  "containerEnv": {
+    "TZ": "Asia/Tokyo"
+  },
+  "remoteEnv": {
+    "PYTHONPATH": "/workspace:${PYTHONPATH}"
+  },
+  "mounts": ["source=.,target=/workspace,type=bind"],
+  "runArgs": ["--shm-size=8gb", "--env-file=.env"],
+  "features": {
+    "ghcr.io/dhoeric/features/google-cloud-cli:1": {}
+  },
+  "hostRequirements": {
+    "gpu": "optional"
+  }
+}
