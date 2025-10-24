@@ -85,14 +85,12 @@ envfile = ".env"
 
 [tool.poe.tasks]
 _write_submission_code = "python -m src.kaggle_utils.write submission-code"
-_write_deps_code = "python -m src.kaggle_utils.write deps-code"
 _scrape_competition = "./scripts/scrape_competition.sh"
 _write_sub_meta = "python -m src.kaggle_utils.write submission-metadata"
 _write_deps_meta = "python -m src.kaggle_utils.write deps-metadata"
 
 setup = [
     "_write_submission_code",
-    "_write_deps_code",
     "_scrape_competition",
     "_write_sub_meta",
     "_write_deps_meta",
@@ -103,7 +101,14 @@ fmt = "pre-commit run --all-files"
 mypy = "mypy ."
 
 [tool.poe.tasks.push-deps]
-shell = "cd codes/deps && kaggle k push && cd ../.."
+shell = """
+    python -m src.kaggle_utils.write deps-code
+    if [ ! -f codes/deps/code.ipynb ]; then
+        echo "code.ipynb not found in codes/deps. Skipping push."
+        exit 0
+    fi
+    cd codes/deps && kaggle k push && cd ../..
+"""
 
 [tool.poe.tasks.push-sub]
 shell = """
