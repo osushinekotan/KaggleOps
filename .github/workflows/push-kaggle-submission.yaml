@@ -18,13 +18,10 @@ jobs:
         with:
           enable-cache: true
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version-file: ".python-version"
-
-      - name: Install the project
-        run: uv sync --locked --all-extras --dev
+      - name: Create virtual environment and install dependencies
+        run: |
+          uv venv --python 3.11
+          uv pip install tyro pydantic pydantic-settings python-dotenv kaggle nbformat
 
       - name: Push Kaggle submission
         env:
@@ -32,6 +29,7 @@ jobs:
           KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
           KAGGLE_COMPETITION_NAME: ${{ secrets.KAGGLE_COMPETITION_NAME }}
         run: |
+          source .venv/bin/activate
           python -m src.kaggle_utils.check nessesary-artifacts-exist
           python -m src.kaggle_utils.upload codes
           sleep 30
