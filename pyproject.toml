@@ -9,7 +9,6 @@ dependencies = [
     "mypy>=1.12.0",
     "pre-commit>=4.0.1",
     "rootutils>=1.0.7",
-    "poethepoet>=0.37.0",
     "google-cloud-aiplatform>=1.70.0",
 ]
 
@@ -80,44 +79,3 @@ ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
-
-[tool.poe]
-envfile = ".env"
-
-[tool.poe.tasks]
-_write_submission_code = "python -m src.kaggle_utils.write submission-code"
-_scrape_competition = "./scripts/scrape_competition.sh"
-_write_sub_meta = "python -m src.kaggle_utils.write submission-metadata"
-_write_deps_meta = "python -m src.kaggle_utils.write deps-metadata"
-
-setup = [
-    "_write_submission_code",
-    "_scrape_competition",
-    "_write_sub_meta",
-    "_write_deps_meta",
-]
-dl-comp = "python -m src.kaggle_utils.download competition-dataset"
-up-art = "python -m src.kaggle_utils.upload artifacts --settings.exp-name"
-fmt = "pre-commit run --all-files"
-mypy = "mypy ."
-
-[tool.poe.tasks.push-deps]
-shell = """
-    python -m src.kaggle_utils.write deps-code
-    if [ ! -f codes/deps/code.ipynb ]; then
-        echo "code.ipynb not found in codes/deps. Skipping push."
-        exit 0
-    fi
-    cd codes/deps && kaggle k push && cd ../..
-"""
-
-[tool.poe.tasks.push-sub]
-shell = """
-    python -m src.kaggle_utils.check nessesary-artifacts-exist
-    python -m src.kaggle_utils.upload codes
-    echo "Waiting for 30 seconds"
-    sleep 30
-    cd codes/submission
-    kaggle k push
-    cd ../..
-"""
