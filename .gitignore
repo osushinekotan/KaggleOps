@@ -170,3 +170,4 @@ data/output/*
 
 docs/*
 !docs/.gitkeep
+!docs/0*
