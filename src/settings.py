@@ -63,7 +63,7 @@ class KaggleDirectorySettings(BaseSettings):
 
 
 class VertexDirectorySettings(BaseSettings):
-    GCS_BUCKET_NAME: str = Field(..., description="GCS bucket name for Vertex AI training.")
+    BUCKET_NAME: str = Field(..., description="GCS bucket name for Vertex AI training.")
     ROOT_DIR: str = Field("/gcs/{bucket}/working", description="Root directory in Vertex AI environment.")
     INPUT_DIR: str = Field("/gcs/{bucket}/input", description="Input directory in Vertex AI environment.")
     ARTIFACT_DIR: str = Field("/gcs/{bucket}/output", description="Artifact directory in Vertex AI environment.")
@@ -119,7 +119,7 @@ class DirectorySettings(BaseSettings):
 
         elif self.run_env == "vertex":
             dir_setting = VertexDirectorySettings()  # type: ignore
-            bucket = dir_setting.GCS_BUCKET_NAME
+            bucket = dir_setting.BUCKET_NAME
             self.ROOT_DIR = Path(dir_setting.ROOT_DIR.format(bucket=bucket))
             self.INPUT_DIR = Path(dir_setting.INPUT_DIR.format(bucket=bucket))
             self.OUTPUT_DIR = Path(dir_setting.OUTPUT_DIR_TEMPLATE.format(bucket=bucket, exp_name=self.exp_name))
