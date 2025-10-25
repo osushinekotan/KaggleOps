@@ -1,0 +1,15 @@
+project_id = "YOUR_PROJECT_ID"
+region     = "YOUR_REGION"
+
+service_accounts = {
+  vertex_ai = {
+    account_id   = "vertex-ai-custom-training-job"
+    display_name = "Vertex AI Service Account"
+    description  = "Service account for Vertex AI custom training jobs"
+    roles = [
+      "roles/aiplatform.user",
+      "roles/storage.objectAdmin",
+      "roles/artifactregistry.reader"
+    ]
+  }
+}
