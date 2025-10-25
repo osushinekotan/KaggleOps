@@ -15,7 +15,8 @@
   "runArgs": ["--shm-size=8gb", "--env-file=.env"],
   "features": {
     "ghcr.io/dhoeric/features/google-cloud-cli:1": {},
-    "ghcr.io/devcontainers/features/terraform:1": {}
+    "ghcr.io/devcontainers/features/terraform:1": {},
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
   },
   "hostRequirements": {
     "gpu": "optional"

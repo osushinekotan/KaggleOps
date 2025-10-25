@@ -65,3 +65,23 @@ endif
 	gcloud storage rsync -r ./data gs://$(BUCKET_NAME)
 	@echo "Push to GCS completed"
 
+.PHONY: docker-push
+docker-push:
+ifndef PROJECT_ID
+	$(error PROJECT_ID is not set)
+endif
+ifndef REGION
+	$(error REGION is not set)
+endif
+ifndef KAGGLE_COMPETITION_NAME
+	$(error KAGGLE_COMPETITION_NAME is not set)
+endif
+	@echo "Building Docker image..."
+	docker build -t $(REGION)-docker.pkg.dev/$(PROJECT_ID)/kaggle-competition-artifacts/$(KAGGLE_COMPETITION_NAME):latest .
+	@echo "Docker build completed"
+	@echo "Configuring Docker authentication for Artifact Registry..."
+	gcloud auth configure-docker $(REGION)-docker.pkg.dev
+	@echo "Pushing Docker image to Artifact Registry..."
+	docker push $(REGION)-docker.pkg.dev/$(PROJECT_ID)/kaggle-competition-artifacts/$(KAGGLE_COMPETITION_NAME):latest
+	@echo "Docker push completed"
+
