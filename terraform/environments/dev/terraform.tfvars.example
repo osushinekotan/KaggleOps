@@ -13,3 +13,13 @@ service_accounts = {
     ]
   }
 }
+
+gcs_buckets = {
+  kaggle_competition_artifacts = {
+    name                        = "YOUR_BUCKET_NAME"
+    location                    = "YOUR_REGION"
+    storage_class               = "STANDARD"
+    versioning_enabled          = true
+    uniform_bucket_level_access = true
+  }
+}

@@ -17,3 +17,14 @@ variable "service_accounts" {
     roles        = list(string)
   }))
 }
+
+variable "gcs_buckets" {
+  description = "The GCS buckets to create."
+  type = map(object({
+    name                        = string
+    location                    = string
+    storage_class               = optional(string)
+    versioning_enabled          = optional(bool, false)
+    uniform_bucket_level_access = optional(bool, true)
+  }))
+}
