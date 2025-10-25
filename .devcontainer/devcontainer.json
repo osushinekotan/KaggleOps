@@ -38,7 +38,8 @@
         "tamasfe.even-better-toml",
         "openai.chatgpt",
         "Anthropic.claude-code",
-        "hashicorp.terraform"
+        "hashicorp.terraform",
+        "ms-vscode.makefile-tools"
       ]
     }
   }
