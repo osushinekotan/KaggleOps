@@ -113,7 +113,7 @@ def train_fn(
 
         # score
         score = score_fn(config, val_df)
-        scores[fold] = score
+        scores[f"fold_{fold}"] = score
         print(f"🏆 Score: {score}\n")
 
     # overall score
