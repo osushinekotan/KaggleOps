@@ -23,3 +23,11 @@ gcs_buckets = {
     uniform_bucket_level_access = true
   }
 }
+
+artifact_registries = {
+  kaggle_competition_artifacts = {
+    repository_id = "kaggle-competition-artifacts"
+    location      = "YOUR_REGION"
+    format        = "DOCKER"
+  }
+}

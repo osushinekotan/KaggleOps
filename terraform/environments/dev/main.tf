@@ -28,3 +28,13 @@ module "gcs_buckets" {
   versioning_enabled          = each.value.versioning_enabled
   uniform_bucket_level_access = each.value.uniform_bucket_level_access
 }
+
+module "artifact_registries" {
+  source   = "../../modules/artifact-registry"
+  for_each = var.artifact_registries
+
+  project_id    = var.project_id
+  repository_id = each.value.repository_id
+  location      = each.value.location
+  format        = each.value.format
+}

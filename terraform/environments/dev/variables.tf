@@ -28,3 +28,12 @@ variable "gcs_buckets" {
     uniform_bucket_level_access = optional(bool, true)
   }))
 }
+
+variable "artifact_registries" {
+  description = "The artifact registries to create."
+  type = map(object({
+    repository_id = string
+    location      = string
+    format        = optional(string, "DOCKER")
+  }))
+}
