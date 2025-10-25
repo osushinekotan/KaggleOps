@@ -18,10 +18,8 @@ init terraform
 
 ```bash
 cd terraform/environments/dev
-cp terraform.tfvars.example terraform.tfvars
+/workspace/scripts/init_tfvars.sh /workspace/.env
 ```
-
-edit `terraform.tfvars` to set the project ID and region.
 
 ```bash
 export GOOGLE_OAUTH_ACCESS_TOKEN=$(gcloud auth application-default print-access-token)
