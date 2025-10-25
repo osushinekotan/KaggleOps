@@ -21,12 +21,14 @@ def run_vertex_training(config: VertexTrainingConfig) -> None:
     aiplatform.init(project=config.project_id, location=config.region, staging_bucket=config.staging_bucket)
 
     display_name = config.display_name or f"training-{Path(config.script_path).stem}"
+    bucket_name = config.staging_bucket.replace("gs://", "").split("/")[0]
 
     job = aiplatform.CustomJob.from_local_script(
         display_name=display_name,
         script_path=config.script_path,
         container_uri=config.container_uri,
         machine_type=config.machine_type,
+        environment_variables={"VERTEX_GCS_BUCKET_NAME": bucket_name},
     )
 
     print(f"Starting Vertex AI Custom Training Job: {display_name}")

@@ -62,6 +62,23 @@ class KaggleDirectorySettings(BaseSettings):
     OUTPUT_DIR: str = Field("/kaggle/working", description="Output directory for Kaggle artifacts.")
 
 
+class VertexDirectorySettings(BaseSettings):
+    GCS_BUCKET_NAME: str = Field(..., description="GCS bucket name for Vertex AI training.")
+    ROOT_DIR: str = Field("/gcs/{bucket}/working", description="Root directory in Vertex AI environment.")
+    INPUT_DIR: str = Field("/gcs/{bucket}/input", description="Input directory in Vertex AI environment.")
+    ARTIFACT_DIR: str = Field("/gcs/{bucket}/output", description="Artifact directory in Vertex AI environment.")
+    OUTPUT_DIR_TEMPLATE: str = Field(
+        "/gcs/{bucket}/output/{{exp_name}}/1", description="Output directory template in Vertex AI environment."
+    )
+
+    model_config = SettingsConfigDict(
+        env_prefix="VERTEX_",
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )
+
+
 class DirectorySettings(BaseSettings):
     """
     Settings for directory paths in the project.
@@ -83,28 +100,43 @@ class DirectorySettings(BaseSettings):
 
     @model_validator(mode="after")
     def set_directories(self) -> "DirectorySettings":
-        self.run_env = self.run_env or ("kaggle" if os.getenv("KAGGLE_DATA_PROXY_TOKEN") else "local")
+        if self.run_env is None:
+            if os.getenv("KAGGLE_DATA_PROXY_TOKEN"):
+                self.run_env = "kaggle"
+            elif os.getenv("VERTEX_GCS_BUCKET_NAME"):
+                self.run_env = "vertex"
+            else:
+                self.run_env = "local"
 
         if self.run_env == "local":
             dir_setting = LocalDirectorySettings()  # type: ignore
+            self.ROOT_DIR = Path(dir_setting.ROOT_DIR)
+            self.INPUT_DIR = Path(dir_setting.INPUT_DIR)
+            self.OUTPUT_DIR = Path(dir_setting.OUTPUT_DIR_TEMPLATE.format(exp_name=self.exp_name))
+            self.ARTIFACT_DIR = Path(dir_setting.ARTIFACT_DIR)
+            self.COMP_DATASET_DIR = Path(dir_setting.INPUT_DIR) / self.kaggle_settings.KAGGLE_COMPETITION_NAME
+            self.ARTIFACT_EXP_DIR = self.ARTIFACT_DIR / self.exp_name / "1"
+
         elif self.run_env == "kaggle":
             dir_setting = KaggleDirectorySettings()  # type: ignore
-        else:
-            raise ValueError(f"Invalid environment type. Must be either 'local' or 'kaggle'. Got: {self.run_env}")
+            self.ROOT_DIR = Path(dir_setting.ROOT_DIR)
+            self.INPUT_DIR = Path(dir_setting.INPUT_DIR)
+            self.OUTPUT_DIR = Path(dir_setting.OUTPUT_DIR)  # type: ignore
+            self.ARTIFACT_DIR = Path(f"{dir_setting.INPUT_DIR}/{self.kaggle_settings.BASE_ARTIFACTS_NAME.lower()}")
+            self.COMP_DATASET_DIR = Path(dir_setting.INPUT_DIR) / self.kaggle_settings.KAGGLE_COMPETITION_NAME
+            self.ARTIFACT_EXP_DIR = self.ARTIFACT_DIR / self.exp_name / "1"
 
-        self.ROOT_DIR = Path(dir_setting.ROOT_DIR)
-        self.INPUT_DIR = Path(dir_setting.INPUT_DIR)
-        self.OUTPUT_DIR = (
-            Path(dir_setting.OUTPUT_DIR)  # type: ignore
-            if self.run_env == "kaggle"
-            else Path(dir_setting.OUTPUT_DIR_TEMPLATE.format(exp_name=self.exp_name))
-        )
-        self.ARTIFACT_DIR = (
-            Path(dir_setting.ARTIFACT_DIR)
-            if self.run_env == "local"
-            else Path(f"{dir_setting.INPUT_DIR}/{self.kaggle_settings.BASE_ARTIFACTS_NAME.lower()}")
-        )
-        self.COMP_DATASET_DIR = Path(dir_setting.INPUT_DIR) / self.kaggle_settings.KAGGLE_COMPETITION_NAME
-        self.ARTIFACT_EXP_DIR = self.ARTIFACT_DIR / self.exp_name / "1"
+        elif self.run_env == "vertex":
+            dir_setting = VertexDirectorySettings()  # type: ignore
+            bucket = dir_setting.GCS_BUCKET_NAME
+            self.ROOT_DIR = Path(dir_setting.ROOT_DIR.format(bucket=bucket))
+            self.INPUT_DIR = Path(dir_setting.INPUT_DIR.format(bucket=bucket))
+            self.OUTPUT_DIR = Path(dir_setting.OUTPUT_DIR_TEMPLATE.format(bucket=bucket, exp_name=self.exp_name))
+            self.ARTIFACT_DIR = Path(dir_setting.ARTIFACT_DIR.format(bucket=bucket))
+            self.COMP_DATASET_DIR = self.INPUT_DIR / self.kaggle_settings.KAGGLE_COMPETITION_NAME
+            self.ARTIFACT_EXP_DIR = self.ARTIFACT_DIR / self.exp_name / "1"
+
+        else:
+            raise ValueError(f"Invalid environment type. Must be 'local', 'kaggle', or 'vertex'. Got: {self.run_env}")
 
         return self
