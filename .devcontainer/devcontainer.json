@@ -14,7 +14,8 @@
   "mounts": ["source=.,target=/workspace,type=bind"],
   "runArgs": ["--shm-size=8gb", "--env-file=.env"],
   "features": {
-    "ghcr.io/dhoeric/features/google-cloud-cli:1": {}
+    "ghcr.io/dhoeric/features/google-cloud-cli:1": {},
+    "ghcr.io/devcontainers/features/terraform:1": {}
   },
   "hostRequirements": {
     "gpu": "optional"
@@ -36,7 +37,8 @@
         "ms-azuretools.vscode-docker",
         "tamasfe.even-better-toml",
         "openai.chatgpt",
-        "Anthropic.claude-code"
+        "Anthropic.claude-code",
+        "hashicorp.terraform"
       ]
     }
   }
