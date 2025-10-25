@@ -6,7 +6,7 @@ gcloud auth login
 create gcs bucket for terraform state
 
 ```bash
-PROJECT_ID=osushinekotan-development
+PROJECT_ID=
 REGION=asia-northeast1
 BUCKET_NAME=${PROJECT_ID}-terraform-state
 
