@@ -72,7 +72,7 @@ endif
 		--env-vars="BUCKET_NAME=$(BUCKET_NAME),KAGGLE_USERNAME=$(KAGGLE_USERNAME),KAGGLE_KEY=$(KAGGLE_KEY),KAGGLE_COMPETITION_NAME=$(KAGGLE_COMPETITION_NAME)"
 
 .PHONY: submit-vertex
-submit-vertex:
+submit-vertex: push-image
 ifndef BUCKET_NAME
 	$(error BUCKET_NAME is not set)
 endif
