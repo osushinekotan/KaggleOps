@@ -1,17 +1,17 @@
 {
   "name": "kaggle-ops",
-  "build": {
-    "dockerfile": "../Dockerfile",
-    "context": ".."
-  },
+  "image": "gcr.io/kaggle-images/python:latest",
   "workspaceFolder": "/workspace",
   "containerEnv": {
-    "TZ": "Asia/Tokyo"
+    "TZ": "Asia/Tokyo",
+    "UV_PROJECT_ENVIRONMENT": "/usr/local/"
   },
   "remoteEnv": {
     "PYTHONPATH": "/workspace:${PYTHONPATH}"
   },
-  "mounts": ["source=.,target=/workspace,type=bind"],
+  "mounts": [
+    "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached"
+  ],
   "runArgs": ["--shm-size=8gb", "--env-file=.env"],
   "features": {
     "ghcr.io/dhoeric/features/google-cloud-cli:1": {},
@@ -39,9 +39,9 @@
         "tamasfe.even-better-toml",
         "openai.chatgpt",
         "Anthropic.claude-code",
-        "hashicorp.terraform",
-        "ms-vscode.makefile-tools"
+        "hashicorp.terraform"
       ]
     }
-  }
+  },
+  "postCreateCommand": "uv pip install -r pyproject.toml --system"
 }
