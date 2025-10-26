@@ -59,6 +59,6 @@ if __name__ == "__main__":
     """
     Command line interface for checking necessary artifacts for the submission code.
     Example:
-    >>> uv run python -m src.kaggle_utils.check nessesary-artifacts-exist
+    >>> uv run python -m src.kaggle_ops.check nessesary-artifacts-exist
     """
     app.cli()

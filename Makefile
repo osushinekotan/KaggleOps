@@ -3,16 +3,16 @@ export
 
 .PHONY: setup
 setup:
-	python -m src.kaggle_utils.write submission-code
+	python -m src.kaggle_ops.write submission-code
 	./scripts/scrape_competition.sh
-	python -m src.kaggle_utils.write submission-metadata
-	python -m src.kaggle_utils.write deps-metadata
-	python -m src.kaggle_utils.write deps-code
+	python -m src.kaggle_ops.write submission-metadata
+	python -m src.kaggle_ops.write deps-metadata
+	python -m src.kaggle_ops.write deps-code
 	@echo "Setup completed"
 
 .PHONY: dl-comp
 dl-comp:
-	python -m src.kaggle_utils.download competition-dataset
+	python -m src.kaggle_ops.download competition-dataset
 
 .PHONY: fmt
 fmt:
@@ -67,7 +67,7 @@ endif
 
 .PHONY: push-deps
 push-deps:
-	python -m src.kaggle_utils.write deps-code
+	python -m src.kaggle_ops.write deps-code
 	cd codes/deps && kaggle k push && cd ../..
 
 .PHONY: pull-data

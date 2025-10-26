@@ -205,9 +205,9 @@ if __name__ == "__main__":
     """Run the code metadata creation commands.
 
     Help:
-    >>> uv run python -m src.kaggle_utils.write deps-metadata -h
-    >>> uv run python -m src.kaggle_utils.write submission-metadata -h
-    >>> uv run python -m src.kaggle_utils.write submission-code -h
-    >>> uv run python -m src.kaggle_utils.write deps-code -h
+    >>> uv run python -m src.kaggle_ops.write deps-metadata -h
+    >>> uv run python -m src.kaggle_ops.write submission-metadata -h
+    >>> uv run python -m src.kaggle_ops.write submission-code -h
+    >>> uv run python -m src.kaggle_ops.write deps-code -h
     """
     app.cli()

@@ -4,8 +4,8 @@ import subprocess
 import time
 from pathlib import Path
 
-from kaggle_utils.check import CheckNecessaryArtifactsSettings, nessesary_artifacts_exist
-from kaggle_utils.upload import UploadArtifactSettings, UploadCodeSettings, artifacts, codes
+from kaggle_ops.check import CheckNecessaryArtifactsSettings, nessesary_artifacts_exist
+from kaggle_ops.upload import UploadArtifactSettings, UploadCodeSettings, artifacts, codes
 from settings import SUBMISSION_CODE_DIR
 
 

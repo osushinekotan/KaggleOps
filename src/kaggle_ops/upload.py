@@ -100,8 +100,8 @@ if __name__ == "__main__":
     """Run the upload commands.
 
     Help:
-    >>> uv run python -m src.kaggle_utils.upload codes -h
-    >>> uv run python -m src.kaggle_utils.upload artifacts -h
-    >>> uv run python -m src.kaggle_utils.upload sources -h
+    >>> uv run python -m src.kaggle_ops.upload codes -h
+    >>> uv run python -m src.kaggle_ops.upload artifacts -h
+    >>> uv run python -m src.kaggle_ops.upload sources -h
     """
     app.cli()

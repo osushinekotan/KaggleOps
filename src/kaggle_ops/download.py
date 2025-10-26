@@ -77,7 +77,7 @@ if __name__ == "__main__":
     """Run the command line interface for downloading datasets.
 
     Help:
-    >>> uv run python -m src.kaggle_utils.download competition-dataset -h
-    >>> uv run python -m src.kaggle_utils.download datasets -h
+    >>> uv run python -m src.kaggle_ops.download competition-dataset -h
+    >>> uv run python -m src.kaggle_ops.download datasets -h
     """
     app.cli()
