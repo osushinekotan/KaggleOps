@@ -29,6 +29,7 @@ IGNORE_PATTERNS = [
     "docs",
     "notebooks",
     "tests",
+    "terraform",
 ]
 
 
