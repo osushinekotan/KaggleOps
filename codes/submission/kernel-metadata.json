@@ -1,0 +1,17 @@
+{
+  "id": "mst8823/spaceship-titanic-submission",
+  "title": "spaceship-titanic-submission",
+  "code_file": "code.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": "true",
+  "enable_gpu": "false",
+  "enable_tpu": "false",
+  "enable_internet": "false",
+  "dataset_sources": ["mst8823/spaceship-titanic-codes"],
+  "competition_sources": ["spaceship-titanic"],
+  "kernel_sources": ["mst8823/spaceship-titanic-deps"],
+  "model_sources": [
+    "mst8823/spaceship-titanic-artifacts/other/spaceship-titanic/1"
+  ]
+}
