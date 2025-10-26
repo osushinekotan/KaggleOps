@@ -6,7 +6,7 @@ resource "google_artifact_registry_repository" "this" {
 
   cleanup_policies {
     id     = "keep-latest-versions"
-    action = "DELETE"
+    action = "KEEP"
 
     most_recent_versions {
       keep_count = var.keep_image_count

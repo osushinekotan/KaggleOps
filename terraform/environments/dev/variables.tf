@@ -37,3 +37,20 @@ variable "artifact_registries" {
     format        = optional(string, "DOCKER")
   }))
 }
+
+variable "workload_identity_pool_id" {
+  type        = string
+  description = "The ID of the Workload Identity Pool"
+  default     = "github"
+}
+
+variable "workload_identity_provider_id" {
+  type        = string
+  description = "The ID of the Workload Identity Pool Provider"
+  default     = "github-provider"
+}
+
+variable "github_repository" {
+  type        = string
+  description = "The GitHub repository in the format 'owner/repo' (e.g., 'username/repo-name')"
+}

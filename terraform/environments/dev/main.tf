@@ -38,3 +38,22 @@ module "artifact_registries" {
   location      = each.value.location
   format        = each.value.format
 }
+
+module "workload_identity" {
+  source = "../../modules/workload-identity"
+
+  project_id         = var.project_id
+  pool_id            = var.workload_identity_pool_id
+  provider_id        = var.workload_identity_provider_id
+  repository         = var.github_repository
+  service_account_id = module.service_accounts["github_actions"].service_account_name
+
+  depends_on = [
+    module.service_accounts
+  ]
+}
+
+output "workload_identity_provider" {
+  value       = module.workload_identity.provider_resource_name
+  description = "Workload Identity Provider resource name for GitHub Actions (use this for WIF_PROVIDER secret)"
+}
