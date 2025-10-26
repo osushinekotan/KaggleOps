@@ -78,9 +78,7 @@ def artifacts(settings: UploadArtifactSettings) -> None:
     model_upload(
         client=client,
         handle=f"{kaggle_settings.BASE_ARTIFACTS_HANDLE}/{exp_name}",
-        local_model_dir=str(
-            Path(directory_settings.ARTIFACT_DIR) / str(exp_name) / "1"
-        ),
+        local_model_dir=str(Path(directory_settings.ARTIFACT_DIR) / str(exp_name) / "1"),
         update=False,
     )
 
@@ -88,11 +86,7 @@ def artifacts(settings: UploadArtifactSettings) -> None:
 @app.command()
 def sources(settings: UploadArtifactSettings) -> None:
     """Upload the codes and artifacts to Kaggle."""
-    codes(
-        settings=UploadCodeSettings(
-            run_env=settings.run_env, kaggle_settings=settings.kaggle_settings
-        )
-    )
+    codes(settings=UploadCodeSettings(run_env=settings.run_env, kaggle_settings=settings.kaggle_settings))
     artifacts(settings)
 
 

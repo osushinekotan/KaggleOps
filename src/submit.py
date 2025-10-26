@@ -35,7 +35,7 @@ def parse_exp_names_from_kernel_metadata(kernel_metadata_path: Path) -> list[str
         model_sources: ["mst8823/spaceship-titanic-artifacts/other/spaceship-titanic/1"]
         -> returns: ["spaceship-titanic"]
     """
-    with open(kernel_metadata_path, "r") as f:
+    with open(kernel_metadata_path) as f:
         metadata = json.load(f)
 
     model_sources = metadata.get("model_sources", [])

@@ -110,4 +110,3 @@ endif
 	docker push $(REGION)-docker.pkg.dev/$(PROJECT_ID)/kaggle-competition-artifacts/$(KAGGLE_COMPETITION_NAME):$(GIT_COMMIT)
 	docker push $(REGION)-docker.pkg.dev/$(PROJECT_ID)/kaggle-competition-artifacts/$(KAGGLE_COMPETITION_NAME):latest
 	@echo "Docker push completed for tags: $(GIT_COMMIT) and latest"
-
