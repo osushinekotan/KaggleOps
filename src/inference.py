@@ -16,7 +16,7 @@ if __name__ == "__main__":
     import rootutils
 
     rootutils.setup_root(".", cwd=True)
-    config = Config()
+    config = Config(name="spaceship-titanic")
     settings = DirectorySettings(exp_name=config.name)
 
     test_df = pl.read_csv(settings.COMP_DATASET_DIR / "test.csv")

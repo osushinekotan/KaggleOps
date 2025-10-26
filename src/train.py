@@ -7,16 +7,17 @@ import joblib
 import numpy as np
 import polars as pl
 import xgboost as xgb
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import StratifiedKFold
 
+from kaggle_ops.utils import get_default_exp_name
 from settings import DirectorySettings
 
 
 # %%
 class Config(BaseModel):
-    name: str = "example_xgb"
+    name: str = Field(..., description="Experiment name. default: branch name")
 
     categorical_features: list[str] = [
         "HomePlanet",
@@ -143,7 +144,7 @@ if __name__ == "__main__":
     import rootutils
 
     rootutils.setup_root(".", cwd=True)
-    config = Config()
+    config = Config(name=get_default_exp_name())
     settings = DirectorySettings(exp_name=config.name)
 
     # %%
