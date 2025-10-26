@@ -18,3 +18,9 @@ variable "format" {
   description = "The format of the artifact registry repository to create."
   default     = "DOCKER"
 }
+
+variable "keep_image_count" {
+  type        = number
+  description = "Number of most recent image versions to keep. Older versions will be automatically deleted."
+  default     = 3
+}
