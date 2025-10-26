@@ -27,14 +27,12 @@ mypy:
 	mypy .
 
 .PHONY: train-local
-train-local: pull
-ifndef script
-	$(error script is not set. Example: make train-local script=src/train.py)
-endif
+train-local: pull-data
 	@echo "Running training script: $(script)"
 	python $(script)
-	$(MAKE) push
+	$(MAKE) push-data
 	@echo "Training completed and results pushed to GCS"
+script ?= src/train.py
 
 .PHONY: submit-local
 submit-local:
