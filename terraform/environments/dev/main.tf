@@ -39,6 +39,12 @@ module "artifact_registries" {
   format        = each.value.format
 }
 
+module "vertex_ai" {
+  source = "../../modules/vertex-ai"
+
+  project_id = var.project_id
+}
+
 module "workload_identity" {
   source = "../../modules/workload-identity"
 
