@@ -46,6 +46,31 @@ endif
 	$(MAKE) push-data
 	@echo "Submission completed"
 
+.PHONY: train-vertex
+train-vertex: push-image
+ifndef script
+	$(error script is not set. Example: make train-vertex script=src/train.py)
+endif
+ifndef PROJECT_ID
+	$(error PROJECT_ID is not set)
+endif
+ifndef REGION
+	$(error REGION is not set)
+endif
+ifndef BUCKET_NAME
+	$(error BUCKET_NAME is not set)
+endif
+	$(eval MACHINE_TYPE ?= n1-standard-4)
+	@echo "Running training script via Vertex AI Custom Job: $(script)"
+	@echo "Machine type: $(MACHINE_TYPE)"
+	gcloud ai custom-jobs create \
+		--project=$(PROJECT_ID) \
+		--region=$(REGION) \
+		--display-name="kaggle-training-$(shell date +%Y%m%d-%H%M%S)" \
+		--worker-pool-spec=machine-type=$(MACHINE_TYPE),replica-count=1,container-image-uri=$(CONTAINER_URI_LATEST) \
+		--args="python,$(script)" \
+		--env-vars="BUCKET_NAME=$(BUCKET_NAME),KAGGLE_USERNAME=$(KAGGLE_USERNAME),KAGGLE_KEY=$(KAGGLE_KEY),KAGGLE_COMPETITION_NAME=$(KAGGLE_COMPETITION_NAME)"
+
 .PHONY: submit-vertex
 submit-vertex:
 ifndef BUCKET_NAME
