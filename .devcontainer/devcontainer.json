@@ -10,7 +10,7 @@
     "PYTHONPATH": "/workspace:${PYTHONPATH}"
   },
   "mounts": [
-    "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached"
+    "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=delegated"
   ],
   "runArgs": ["--shm-size=8gb", "--env-file=.env"],
   "features": {
