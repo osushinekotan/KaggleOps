@@ -125,13 +125,9 @@ endif
 ifndef KAGGLE_COMPETITION_NAME
 	$(error KAGGLE_COMPETITION_NAME is not set)
 endif
-	@echo "Building Docker image with tag: $(GIT_COMMIT)..."
-	docker build -t $(CONTAINER_URI_COMMIT) .
-	docker tag $(CONTAINER_URI_COMMIT) $(CONTAINER_URI_LATEST)
-	@echo "Docker build completed"
-	@echo "Configuring Docker authentication for Artifact Registry..."
-	gcloud auth configure-docker $(REGION)-docker.pkg.dev
-	@echo "Pushing Docker image to Artifact Registry..."
-	docker push $(CONTAINER_URI_COMMIT)
-	docker push $(CONTAINER_URI_LATEST)
-	@echo "Docker push completed for tags: $(GIT_COMMIT) and latest"
+	@echo "Submitting build to Cloud Build..."
+	gcloud builds submit \
+		--config=cloudbuild.yaml \
+		--substitutions=_REGION=$(REGION),_KAGGLE_COMPETITION_NAME=$(KAGGLE_COMPETITION_NAME) \
+		--project=$(PROJECT_ID)
+	@echo "Cloud Build completed"

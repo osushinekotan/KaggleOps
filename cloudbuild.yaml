@@ -1,0 +1,17 @@
+steps:
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - "build"
+      - "-t"
+      - "${_REGION}-docker.pkg.dev/${PROJECT_ID}/kaggle-competition-artifacts/${_KAGGLE_COMPETITION_NAME}:${SHORT_SHA}"
+      - "-t"
+      - "${_REGION}-docker.pkg.dev/${PROJECT_ID}/kaggle-competition-artifacts/${_KAGGLE_COMPETITION_NAME}:latest"
+      - "."
+
+images:
+  - "${_REGION}-docker.pkg.dev/${PROJECT_ID}/kaggle-competition-artifacts/${_KAGGLE_COMPETITION_NAME}:${SHORT_SHA}"
+  - "${_REGION}-docker.pkg.dev/${PROJECT_ID}/kaggle-competition-artifacts/${_KAGGLE_COMPETITION_NAME}:latest"
+
+substitutions:
+  _REGION: "YOUR_REGION"
+  _KAGGLE_COMPETITION_NAME: "YOUR_COMPETITION_NAME"
