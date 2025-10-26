@@ -34,10 +34,7 @@ endif
 
 .PHONY: submit-local
 submit-local:
-ifndef EXP_NAME
-	$(error EXP_NAME is not set)
-endif
-	python -m src.submit --exp-name $(EXP_NAME)
+	python -m src.submit
 
 .PHONY: push-deps
 push-deps:
