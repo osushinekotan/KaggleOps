@@ -1,5 +1,9 @@
 include .env
-export
+
+GIT_COMMIT := $(shell git rev-parse --short HEAD)
+CONTAINER_URI_BASE := $(REGION)-docker.pkg.dev/$(PROJECT_ID)/kaggle-competition-artifacts/$(KAGGLE_COMPETITION_NAME)
+CONTAINER_URI_COMMIT := $(CONTAINER_URI_BASE):$(GIT_COMMIT)
+CONTAINER_URI_LATEST := $(CONTAINER_URI_BASE):latest
 
 .PHONY: setup
 setup:
@@ -53,15 +57,12 @@ endif
 ifndef REGION
 	$(error REGION is not set)
 endif
-ifndef CONTAINER_URI
-	$(error CONTAINER_URI is not set)
-endif
 	@echo "Submitting via Vertex AI Custom Job..."
 	gcloud ai custom-jobs create \
 		--project=$(PROJECT_ID) \
 		--region=$(REGION) \
 		--display-name="kaggle-submission-$(shell date +%Y%m%d-%H%M%S)" \
-		--worker-pool-spec=machine-type=n1-standard-4,replica-count=1,container-image-uri=$(CONTAINER_URI) \
+		--worker-pool-spec=machine-type=n1-standard-4,replica-count=1,container-image-uri=$(CONTAINER_URI_LATEST) \
 		--args="python,-m,src.submit" \
 		--env-vars="BUCKET_NAME=$(BUCKET_NAME),KAGGLE_USERNAME=$(KAGGLE_USERNAME),KAGGLE_KEY=$(KAGGLE_KEY),KAGGLE_COMPETITION_NAME=$(KAGGLE_COMPETITION_NAME)"
 
@@ -99,14 +100,13 @@ endif
 ifndef KAGGLE_COMPETITION_NAME
 	$(error KAGGLE_COMPETITION_NAME is not set)
 endif
-	$(eval GIT_COMMIT := $(shell git rev-parse --short HEAD))
 	@echo "Building Docker image with tag: $(GIT_COMMIT)..."
-	docker build -t $(REGION)-docker.pkg.dev/$(PROJECT_ID)/kaggle-competition-artifacts/$(KAGGLE_COMPETITION_NAME):$(GIT_COMMIT) .
-	docker tag $(REGION)-docker.pkg.dev/$(PROJECT_ID)/kaggle-competition-artifacts/$(KAGGLE_COMPETITION_NAME):$(GIT_COMMIT) $(REGION)-docker.pkg.dev/$(PROJECT_ID)/kaggle-competition-artifacts/$(KAGGLE_COMPETITION_NAME):latest
+	docker build -t $(CONTAINER_URI_COMMIT) .
+	docker tag $(CONTAINER_URI_COMMIT) $(CONTAINER_URI_LATEST)
 	@echo "Docker build completed"
 	@echo "Configuring Docker authentication for Artifact Registry..."
 	gcloud auth configure-docker $(REGION)-docker.pkg.dev
 	@echo "Pushing Docker image to Artifact Registry..."
-	docker push $(REGION)-docker.pkg.dev/$(PROJECT_ID)/kaggle-competition-artifacts/$(KAGGLE_COMPETITION_NAME):$(GIT_COMMIT)
-	docker push $(REGION)-docker.pkg.dev/$(PROJECT_ID)/kaggle-competition-artifacts/$(KAGGLE_COMPETITION_NAME):latest
+	docker push $(CONTAINER_URI_COMMIT)
+	docker push $(CONTAINER_URI_LATEST)
 	@echo "Docker push completed for tags: $(GIT_COMMIT) and latest"
