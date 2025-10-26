@@ -1,4 +1,4 @@
-include .env
+-include .env
 
 GIT_COMMIT := $(shell git rev-parse --short HEAD)
 CONTAINER_URI_BASE := $(REGION)-docker.pkg.dev/$(PROJECT_ID)/kaggle-competition-artifacts/$(KAGGLE_COMPETITION_NAME)
