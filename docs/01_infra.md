@@ -1,3 +1,5 @@
+authorize gcloud
+
 ```bash
 gcloud auth application-default login
 gcloud auth login
@@ -36,4 +38,10 @@ apply terraform
 
 ```bash
 terraform apply
+```
+
+push image
+
+```bash
+make push-image
 ```
