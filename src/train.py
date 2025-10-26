@@ -11,8 +11,8 @@ from pydantic import BaseModel, Field
 from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import StratifiedKFold
 
-from kaggle_ops.utils.utils import get_default_exp_name
-from settings import DirectorySettings
+from src.kaggle_ops.utils.utils import get_default_exp_name
+from src.settings import DirectorySettings
 
 
 # %%

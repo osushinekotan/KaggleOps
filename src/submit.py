@@ -3,10 +3,10 @@ import subprocess
 import time
 from pathlib import Path
 
-from kaggle_ops.check import CheckNecessaryArtifactsSettings, nessesary_artifacts_exist
-from kaggle_ops.upload import UploadArtifactSettings, UploadCodeSettings, artifacts, codes
-from kaggle_ops.utils.utils import get_run_env
-from settings import SUBMISSION_CODE_DIR
+from src.kaggle_ops.check import CheckNecessaryArtifactsSettings, nessesary_artifacts_exist
+from src.kaggle_ops.upload import UploadArtifactSettings, UploadCodeSettings, artifacts, codes
+from src.kaggle_ops.utils.utils import get_run_env
+from src.settings import SUBMISSION_CODE_DIR
 
 
 def parse_exp_names_from_kernel_metadata(kernel_metadata_path: Path) -> list[str]:

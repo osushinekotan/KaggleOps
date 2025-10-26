@@ -3,7 +3,7 @@ from pathlib import Path
 from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from kaggle_ops.utils.utils import get_run_env
+from src.kaggle_ops.utils.utils import get_run_env
 
 CODES_DIR = Path("./codes")
 DEPS_CODE_DIR = CODES_DIR / "deps"

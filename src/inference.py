@@ -1,7 +1,7 @@
 import polars as pl
 
-from settings import DirectorySettings
-from train import Config, preprocess, test_fn
+from src.settings import DirectorySettings
+from src.train import Config, preprocess, test_fn
 
 
 def _build_submission(sample_df: pl.DataFrame, pred_df: pl.DataFrame) -> pl.DataFrame:
@@ -13,9 +13,6 @@ def _build_submission(sample_df: pl.DataFrame, pred_df: pl.DataFrame) -> pl.Data
 
 
 if __name__ == "__main__":
-    import rootutils
-
-    rootutils.setup_root(".", cwd=True)
     config = Config(name="spaceship-titanic")
     settings = DirectorySettings(exp_name=config.name)
 
