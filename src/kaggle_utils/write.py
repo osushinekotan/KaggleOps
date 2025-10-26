@@ -166,35 +166,27 @@ def deps_code() -> None:
     deps_code_path = DEPS_CODE_DIR / "code.ipynb"
 
     if not requirements_path.exists():
-        logger.info("requirements.txt not found. Skipping code.ipynb generation.")
-        if deps_code_path.exists():
-            deps_code_path.unlink()
-            logger.info("Deleted existing code.ipynb")
-        return
+        raise FileNotFoundError(f"requirements.txt not found: {requirements_path}")
 
     with open(requirements_path, encoding="utf-8") as f:
         requirements = [line.strip() for line in f if line.strip() and not line.strip().startswith("#")]
 
     if not requirements:
-        logger.info("No requirements found in requirements.txt.")
-        if deps_code_path.exists():
-            deps_code_path.unlink()
-            logger.info("Deleted existing code.ipynb")
-        return
+        notebook = new_notebook(cells=[new_code_cell(source="pass")])
+    else:
+        # Build pip download command for all requirements
+        download_cmd = "!pip download -d /kaggle/working " + " ".join(requirements)
 
-    # Build pip download command for all requirements
-    download_cmd = "!pip download -d /kaggle/working " + " ".join(requirements)
-
-    install_deps_code = (
-        download_cmd + "\n"
-        "!pip install /kaggle/working/*.whl "
-        "--force-reinstall "
-        "--root-user-action ignore "
-        "--no-deps "
-        "--no-index "
-        "--find-links /kaggle/working "
-    )
-    notebook = new_notebook(cells=[new_code_cell(source=install_deps_code)])
+        install_deps_code = (
+            download_cmd + "\n"
+            "!pip install /kaggle/working/*.whl "
+            "--force-reinstall "
+            "--root-user-action ignore "
+            "--no-deps "
+            "--no-index "
+            "--find-links /kaggle/working "
+        )
+        notebook = new_notebook(cells=[new_code_cell(source=install_deps_code)])
 
     # add kernel metadata
     notebook["metadata"]["kernelspec"] = {
