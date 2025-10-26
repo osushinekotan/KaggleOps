@@ -34,7 +34,36 @@ endif
 
 .PHONY: submit-local
 submit-local:
+ifndef BUCKET_NAME
+	$(error BUCKET_NAME is not set)
+endif
+	$(MAKE) pull-data
 	python -m src.submit
+	$(MAKE) push-data
+	@echo "Submission completed"
+
+.PHONY: submit-vertex
+submit-vertex:
+ifndef BUCKET_NAME
+	$(error BUCKET_NAME is not set)
+endif
+ifndef PROJECT_ID
+	$(error PROJECT_ID is not set)
+endif
+ifndef REGION
+	$(error REGION is not set)
+endif
+ifndef CONTAINER_URI
+	$(error CONTAINER_URI is not set)
+endif
+	@echo "Submitting via Vertex AI Custom Job..."
+	gcloud ai custom-jobs create \
+		--project=$(PROJECT_ID) \
+		--region=$(REGION) \
+		--display-name="kaggle-submission-$(shell date +%Y%m%d-%H%M%S)" \
+		--worker-pool-spec=machine-type=n1-standard-4,replica-count=1,container-image-uri=$(CONTAINER_URI) \
+		--args="python,-m,src.submit" \
+		--env-vars="BUCKET_NAME=$(BUCKET_NAME),KAGGLE_USERNAME=$(KAGGLE_USERNAME),KAGGLE_KEY=$(KAGGLE_KEY),KAGGLE_COMPETITION_NAME=$(KAGGLE_COMPETITION_NAME)"
 
 .PHONY: push-deps
 push-deps:

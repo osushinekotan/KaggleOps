@@ -9,6 +9,18 @@ from kaggle_utils.upload import UploadArtifactSettings, UploadCodeSettings, arti
 from settings import SUBMISSION_CODE_DIR
 
 
+def get_run_env() -> str:
+    """Detect and return the current runtime environment."""
+    if os.getenv("KAGGLE_DATA_PROXY_TOKEN"):
+        return "kaggle"
+    elif os.getenv("BUCKET_NAME"):
+        # Check if running in Vertex AI (GCSFuse mounted)
+        bucket_name = os.getenv("BUCKET_NAME")
+        if Path(f"/gcs/{bucket_name}").exists():
+            return "vertex"
+    return "local"
+
+
 def parse_exp_names_from_kernel_metadata(kernel_metadata_path: Path) -> list[str]:
     """
     Parse experiment names from kernel-metadata.json's model_sources.
@@ -41,6 +53,9 @@ def parse_exp_names_from_kernel_metadata(kernel_metadata_path: Path) -> list[str
 
 def push_submission() -> None:
     """Upload artifacts, code, and push submission to Kaggle."""
+    run_env = get_run_env()
+    print(f"Running in {run_env} environment")
+
     # Parse exp_names from kernel-metadata.json
     kernel_metadata_path = SUBMISSION_CODE_DIR / "kernel-metadata.json"
     if not kernel_metadata_path.exists():
@@ -55,7 +70,7 @@ def push_submission() -> None:
     # Upload artifacts for each exp_name
     for exp_name in exp_names:
         print(f"Uploading artifacts: {exp_name}")
-        artifact_settings = UploadArtifactSettings(exp_name=exp_name)
+        artifact_settings = UploadArtifactSettings(exp_name=exp_name, run_env=run_env)
         artifacts(artifact_settings)
 
     print("Waiting 60s for artifacts to be processed...")
@@ -69,7 +84,7 @@ def push_submission() -> None:
 
     # Upload codes
     print("Uploading code...")
-    code_settings = UploadCodeSettings()
+    code_settings = UploadCodeSettings(run_env=run_env)
     codes(code_settings)
 
     print("Waiting 30s...")
