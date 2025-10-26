@@ -1,8 +1,9 @@
-import os
 from pathlib import Path
 
 from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+from kaggle_ops.utils.utils import get_run_env
 
 CODES_DIR = Path("./codes")
 DEPS_CODE_DIR = CODES_DIR / "deps"
@@ -94,10 +95,7 @@ class DirectorySettings(BaseSettings):
     @model_validator(mode="after")
     def set_directories(self) -> "DirectorySettings":
         if self.run_env is None:
-            if os.getenv("KAGGLE_DATA_PROXY_TOKEN"):
-                self.run_env = "kaggle"
-            else:
-                self.run_env = "local"
+            self.run_env = get_run_env()
 
         if self.run_env == "local":
             dir_setting = LocalDirectorySettings()  # type: ignore

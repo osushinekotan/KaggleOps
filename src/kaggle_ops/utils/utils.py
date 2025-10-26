@@ -1,6 +1,23 @@
 import os
+from pathlib import Path
 
 from git import Repo
+
+
+def get_run_env() -> str:
+    """Detect and return the current runtime environment.
+
+    Returns:
+        str: One of 'kaggle', 'vertex', or 'local'
+    """
+    if os.getenv("KAGGLE_DATA_PROXY_TOKEN"):
+        return "kaggle"
+    elif os.getenv("BUCKET_NAME"):
+        # Check if running in Vertex AI (GCSFuse mounted)
+        bucket_name = os.getenv("BUCKET_NAME")
+        if Path(f"/gcs/{bucket_name}").exists():
+            return "vertex"
+    return "local"
 
 
 def get_default_exp_name(use_commit_hash: bool = False) -> str:

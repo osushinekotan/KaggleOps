@@ -1,24 +1,12 @@
 import json
-import os
 import subprocess
 import time
 from pathlib import Path
 
 from kaggle_ops.check import CheckNecessaryArtifactsSettings, nessesary_artifacts_exist
 from kaggle_ops.upload import UploadArtifactSettings, UploadCodeSettings, artifacts, codes
+from kaggle_ops.utils.utils import get_run_env
 from settings import SUBMISSION_CODE_DIR
-
-
-def get_run_env() -> str:
-    """Detect and return the current runtime environment."""
-    if os.getenv("KAGGLE_DATA_PROXY_TOKEN"):
-        return "kaggle"
-    elif os.getenv("BUCKET_NAME"):
-        # Check if running in Vertex AI (GCSFuse mounted)
-        bucket_name = os.getenv("BUCKET_NAME")
-        if Path(f"/gcs/{bucket_name}").exists():
-            return "vertex"
-    return "local"
 
 
 def parse_exp_names_from_kernel_metadata(kernel_metadata_path: Path) -> list[str]:
