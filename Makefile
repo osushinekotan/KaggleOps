@@ -7,6 +7,7 @@ setup:
 	./scripts/scrape_competition.sh
 	python -m src.kaggle_utils.write submission-metadata
 	python -m src.kaggle_utils.write deps-metadata
+	python -m src.kaggle_utils.write deps-code
 	@echo "Setup completed"
 
 .PHONY: dl-comp
@@ -41,14 +42,10 @@ endif
 .PHONY: push-deps
 push-deps:
 	python -m src.kaggle_utils.write deps-code
-	@if [ ! -f codes/deps/code.ipynb ]; then \
-		echo "code.ipynb not found in codes/deps. Skipping push."; \
-		exit 0; \
-	fi
 	cd codes/deps && kaggle k push && cd ../..
 
-.PHONY: pull
-pull:
+.PHONY: pull-data
+pull-data:
 ifndef BUCKET_NAME
 	$(error BUCKET_NAME is not set)
 endif
@@ -56,8 +53,8 @@ endif
 	gcloud storage rsync -r gs://$(BUCKET_NAME) ./data
 	@echo "Pull from GCS completed"
 
-.PHONY: push
-push:
+.PHONY: push-data
+push-data:
 ifndef BUCKET_NAME
 	$(error BUCKET_NAME is not set)
 endif
@@ -65,8 +62,8 @@ endif
 	gcloud storage rsync -r ./data gs://$(BUCKET_NAME)
 	@echo "Push to GCS completed"
 
-.PHONY: docker-push
-docker-push:
+.PHONY: push-image
+push-image:
 ifndef PROJECT_ID
 	$(error PROJECT_ID is not set)
 endif
