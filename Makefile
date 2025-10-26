@@ -41,7 +41,6 @@ ifndef BUCKET_NAME
 endif
 	$(MAKE) pull-data
 	python -m src.submit
-	$(MAKE) push-data
 	@echo "Submission completed"
 
 .PHONY: train-vertex
