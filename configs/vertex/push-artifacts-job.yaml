@@ -10,6 +10,8 @@ workerPoolSpecs:
         - src.kaggle_ops.push
         - --run-env
         - vertex
+        - --exp-names
+        - ${EXP_NAMES}
       env:
         - name: BUCKET_NAME
           value: ${BUCKET_NAME}

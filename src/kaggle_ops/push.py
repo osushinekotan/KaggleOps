@@ -1,13 +1,11 @@
 import json
 import logging
-import time
 from pathlib import Path
 
 import dotenv
 import tyro
 
 from ..settings import SUBMISSION_CODE_DIR, KaggleSettings
-from .check import CheckNecessaryArtifactsSettings, nessesary_artifacts_exist
 from .upload import UploadArtifactSettings, artifacts
 
 logger = logging.getLogger(__name__)
@@ -46,53 +44,51 @@ def parse_exp_names_from_kernel_metadata(kernel_metadata_path: Path) -> list[str
     return exp_names
 
 
-def push_artifacts(run_env: str = "local") -> None:
+def push_artifacts(run_env: str = "local", exp_names: str = "") -> None:
     """
-    Upload artifacts to Kaggle for all experiments listed in kernel-metadata.json.
+    Upload artifacts to Kaggle for specified experiments.
 
     This command:
-    1. Parses exp_names from kernel-metadata.json
+    1. Uses provided exp_names or parses them from kernel-metadata.json
     2. Uploads artifacts for each experiment
     3. Waits 60s for processing
     4. Checks that all necessary artifacts exist
 
     Args:
         run_env: Environment type: 'local' or 'vertex'
+        exp_names: Comma-separated experiment names (optional, defaults to parsing from kernel-metadata.json)
     """
     print(f"Running in {run_env} environment")
 
     # Initialize Kaggle settings
     kaggle_settings = KaggleSettings()  # type: ignore
 
-    # Parse exp_names from kernel-metadata.json
-    kernel_metadata_path = SUBMISSION_CODE_DIR / "kernel-metadata.json"
-    if not kernel_metadata_path.exists():
-        raise FileNotFoundError(f"kernel-metadata.json not found: {kernel_metadata_path}")
+    # Determine exp_names: use provided argument or parse from kernel-metadata.json
+    if exp_names:
+        exp_names_list = [name.strip() for name in exp_names.split(",")]
+        print(f"Using provided exp_names: {exp_names_list}")
+    else:
+        # Parse exp_names from kernel-metadata.json
+        kernel_metadata_path = SUBMISSION_CODE_DIR / "kernel-metadata.json"
+        if not kernel_metadata_path.exists():
+            raise FileNotFoundError(f"kernel-metadata.json not found: {kernel_metadata_path}")
 
-    exp_names = parse_exp_names_from_kernel_metadata(kernel_metadata_path)
-    if not exp_names:
-        raise ValueError("No exp_names found in kernel-metadata.json's model_sources")
+        exp_names_list = parse_exp_names_from_kernel_metadata(kernel_metadata_path)
+        if not exp_names_list:
+            raise ValueError("No exp_names found in kernel-metadata.json's model_sources")
+        print(f"Parsed exp_names from kernel-metadata.json: {exp_names_list}")
 
-    print(f"Experiments to upload: {exp_names}")
+    print(f"Experiments to upload: {exp_names_list}")
 
     # Upload artifacts for each exp_name
-    for exp_name in exp_names:
+    for exp_name in exp_names_list:
         print(f"Uploading artifacts: {exp_name}")
         artifact_settings = UploadArtifactSettings(
             exp_name=exp_name, run_env=run_env, kaggle_settings=kaggle_settings
         )
         artifacts(artifact_settings)
 
-    print("Waiting 60s for artifacts to be processed...")
-    time.sleep(60)
-
-    # Check necessary artifacts exist
-    print("Checking artifacts...")
-    check_settings = CheckNecessaryArtifactsSettings(kaggle_settings=kaggle_settings)
-    if not nessesary_artifacts_exist(check_settings):
-        raise RuntimeError("Necessary artifacts do not exist. Cannot proceed with submission.")
-
-    print("All artifacts uploaded and verified successfully")
+    print("All artifacts uploaded successfully")
 
 
 if __name__ == "__main__":

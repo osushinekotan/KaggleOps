@@ -103,8 +103,11 @@ endif
 ifndef REGION
 	$(error REGION is not set)
 endif
+	@echo "Parsing experiment names from kernel-metadata.json..."
+	$(eval EXP_NAMES := $(shell python -m src.kaggle_ops.parse_exp_names))
+	@echo "Experiment names: $(EXP_NAMES)"
 	@echo "Pushing artifacts via Vertex AI Custom Job..."
-	@envsubst < configs/vertex/push-artifacts-job.yaml > /tmp/vertex-push-artifacts-job.yaml
+	@export EXP_NAMES=$(EXP_NAMES) && envsubst < configs/vertex/push-artifacts-job.yaml > /tmp/vertex-push-artifacts-job.yaml
 	gcloud ai custom-jobs create \
 		--project=$(PROJECT_ID) \
 		--region=$(REGION) \
