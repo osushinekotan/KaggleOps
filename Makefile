@@ -1,7 +1,5 @@
 -include .env
 
-export PYTHONUNBUFFERED=1
-
 GIT_COMMIT := $(shell git rev-parse --short HEAD)
 CONTAINER_URI_BASE := $(REGION)-docker.pkg.dev/$(PROJECT_ID)/kaggle-competition-artifacts/$(KAGGLE_COMPETITION_NAME)
 CONTAINER_URI_COMMIT := $(CONTAINER_URI_BASE):$(GIT_COMMIT)
@@ -162,6 +160,7 @@ endif
 	@echo "Submitting build to Cloud Build..."
 	gcloud builds submit \
 		--config=cloudbuild.yaml \
+		--timeout=1h \
 		--substitutions=_REGION=$(REGION),_KAGGLE_COMPETITION_NAME=$(KAGGLE_COMPETITION_NAME),SHORT_SHA=$(GIT_COMMIT) \
 		--project=$(PROJECT_ID)
 	@echo "Cloud Build completed"
