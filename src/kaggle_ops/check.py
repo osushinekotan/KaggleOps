@@ -61,4 +61,5 @@ if __name__ == "__main__":
     Example:
     >>> uv run python -m src.kaggle_ops.check nessesary-artifacts-exist
     """
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s", force=True)
     app.cli()

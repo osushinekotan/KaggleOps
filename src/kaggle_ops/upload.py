@@ -98,4 +98,5 @@ if __name__ == "__main__":
     >>> uv run python -m src.kaggle_ops.upload artifacts -h
     >>> uv run python -m src.kaggle_ops.upload sources -h
     """
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s", force=True)
     app.cli()

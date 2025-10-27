@@ -210,4 +210,5 @@ if __name__ == "__main__":
     >>> uv run python -m src.kaggle_ops.write submission-code -h
     >>> uv run python -m src.kaggle_ops.write deps-code -h
     """
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s", force=True)
     app.cli()

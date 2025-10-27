@@ -105,4 +105,9 @@ if __name__ == "__main__":
     >>> uv run python -m src.kaggle_ops.push --run-env local
     >>> uv run python -m src.kaggle_ops.push --run-env vertex
     """
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(levelname)s: %(message)s',
+        force=True
+    )
     tyro.cli(push_artifacts)

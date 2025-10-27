@@ -80,4 +80,5 @@ if __name__ == "__main__":
     >>> uv run python -m src.kaggle_ops.download competition-dataset -h
     >>> uv run python -m src.kaggle_ops.download datasets -h
     """
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s", force=True)
     app.cli()
