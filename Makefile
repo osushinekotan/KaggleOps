@@ -63,6 +63,8 @@ ifndef BUCKET_NAME
 endif
 	$(MAKE) push-arts-local
 	$(MAKE) push-code-local
+	@echo "Waiting for artifacts to process..."
+	sleep 60
 	$(MAKE) push-sub
 	@echo "Submission completed"
 
@@ -118,6 +120,8 @@ ifndef BUCKET_NAME
 endif
 	$(MAKE) push-arts-vertex
 	$(MAKE) push-code-local
+	@echo "Waiting for artifacts to process..."
+	sleep 60
 	$(MAKE) push-sub
 	@echo "Submission via Vertex AI completed"
 
