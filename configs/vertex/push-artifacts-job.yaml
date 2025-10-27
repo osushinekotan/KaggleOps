@@ -1,0 +1,21 @@
+workerPoolSpecs:
+  - machineSpec:
+      machineType: n1-standard-4
+    replicaCount: 1
+    containerSpec:
+      imageUri: ${CONTAINER_URI_LATEST}
+      args:
+        - python
+        - -m
+        - src.kaggle_ops.push
+        - --run-env
+        - vertex
+      env:
+        - name: BUCKET_NAME
+          value: ${BUCKET_NAME}
+        - name: KAGGLE_USERNAME
+          value: ${KAGGLE_USERNAME}
+        - name: KAGGLE_KEY
+          value: ${KAGGLE_KEY}
+        - name: KAGGLE_COMPETITION_NAME
+          value: ${KAGGLE_COMPETITION_NAME}

@@ -5,6 +5,8 @@ CONTAINER_URI_BASE := $(REGION)-docker.pkg.dev/$(PROJECT_ID)/kaggle-competition-
 CONTAINER_URI_COMMIT := $(CONTAINER_URI_BASE):$(GIT_COMMIT)
 CONTAINER_URI_LATEST := $(CONTAINER_URI_BASE):latest
 
+export CONTAINER_URI_LATEST
+
 .PHONY: setup
 setup:
 	python -m src.kaggle_ops.write submission-code
@@ -83,13 +85,12 @@ endif
 	$(eval MACHINE_TYPE ?= n1-standard-4)
 	@echo "Running training script via Vertex AI Custom Job: $(script)"
 	@echo "Machine type: $(MACHINE_TYPE)"
+	@export SCRIPT=$(script) && envsubst < configs/vertex/training-job.yaml > /tmp/vertex-training-job.yaml
 	gcloud ai custom-jobs create \
 		--project=$(PROJECT_ID) \
 		--region=$(REGION) \
 		--display-name="kaggle-training-$(shell date +%Y%m%d-%H%M%S)" \
-		--worker-pool-spec=machine-type=$(MACHINE_TYPE),replica-count=1,container-image-uri=$(CONTAINER_URI_LATEST) \
-		--args="python,$(script)" \
-		--env-vars="BUCKET_NAME=$(BUCKET_NAME),KAGGLE_USERNAME=$(KAGGLE_USERNAME),KAGGLE_KEY=$(KAGGLE_KEY),KAGGLE_COMPETITION_NAME=$(KAGGLE_COMPETITION_NAME)"
+		--config=/tmp/vertex-training-job.yaml
 
 .PHONY: push-arts-vertex
 push-arts-vertex:
@@ -103,13 +104,12 @@ ifndef REGION
 	$(error REGION is not set)
 endif
 	@echo "Pushing artifacts via Vertex AI Custom Job..."
+	@envsubst < configs/vertex/push-artifacts-job.yaml > /tmp/vertex-push-artifacts-job.yaml
 	gcloud ai custom-jobs create \
 		--project=$(PROJECT_ID) \
 		--region=$(REGION) \
 		--display-name="kaggle-push-artifacts-$(shell date +%Y%m%d-%H%M%S)" \
-		--worker-pool-spec=machine-type=n1-standard-4,replica-count=1,container-image-uri=$(CONTAINER_URI_LATEST) \
-		--args="python,-m,src.kaggle_ops.push,--run-env,vertex" \
-		--env-vars="BUCKET_NAME=$(BUCKET_NAME),KAGGLE_USERNAME=$(KAGGLE_USERNAME),KAGGLE_KEY=$(KAGGLE_KEY),KAGGLE_COMPETITION_NAME=$(KAGGLE_COMPETITION_NAME)"
+		--config=/tmp/vertex-push-artifacts-job.yaml
 
 .PHONY: submit-vertex
 submit-vertex:

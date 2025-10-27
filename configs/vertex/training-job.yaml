@@ -1,0 +1,18 @@
+workerPoolSpecs:
+  - machineSpec:
+      machineType: ${MACHINE_TYPE}
+    replicaCount: 1
+    containerSpec:
+      imageUri: ${CONTAINER_URI_LATEST}
+      args:
+        - python
+        - ${SCRIPT}
+      env:
+        - name: BUCKET_NAME
+          value: ${BUCKET_NAME}
+        - name: KAGGLE_USERNAME
+          value: ${KAGGLE_USERNAME}
+        - name: KAGGLE_KEY
+          value: ${KAGGLE_KEY}
+        - name: KAGGLE_COMPETITION_NAME
+          value: ${KAGGLE_COMPETITION_NAME}
