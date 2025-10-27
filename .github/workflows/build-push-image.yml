@@ -1,0 +1,61 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "Dockerfile"
+      - "src/**"
+      - "pyproject.toml"
+      - "cloudbuild.yaml"
+  workflow_dispatch:
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Build and Push Docker Image
+        id: build
+        env:
+          PROJECT_ID: ${{ secrets.PROJECT_ID }}
+          REGION: ${{ secrets.REGION }}
+          KAGGLE_COMPETITION_NAME: ${{ secrets.KAGGLE_COMPETITION_NAME }}
+        run: |
+          # Get short commit SHA
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          echo "short_sha=${SHORT_SHA}" >> $GITHUB_OUTPUT
+
+          # Build and push with Cloud Build
+          gcloud builds submit \
+            --config=cloudbuild.yaml \
+            --substitutions=_REGION=${REGION},_KAGGLE_COMPETITION_NAME=${KAGGLE_COMPETITION_NAME},SHORT_SHA=${SHORT_SHA} \
+            --project=${PROJECT_ID}
+
+          # Set container URI with commit hash
+          CONTAINER_URI="${REGION}-docker.pkg.dev/${PROJECT_ID}/kaggle-competition-artifacts/${KAGGLE_COMPETITION_NAME}:${SHORT_SHA}"
+          echo "container_uri=${CONTAINER_URI}" >> $GITHUB_OUTPUT
+          echo "Container URI: ${CONTAINER_URI}"
+
+      - name: Build Summary
+        run: |
+          echo "Docker image built and pushed successfully!"
+          echo "Image URI: ${{ steps.build.outputs.container_uri }}"
+          echo "Commit SHA: ${{ steps.build.outputs.short_sha }}"

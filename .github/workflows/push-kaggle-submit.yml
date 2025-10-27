@@ -1,16 +1,10 @@
-name: Build, Push Docker Image and Submit to Kaggle
+name: Push Artifacts and Submit to Kaggle
 
 on:
   workflow_dispatch:
-  pull_request:
-    paths:
-      - "Dockerfile"
-      - "src/**"
-      - "pyproject.toml"
-      - "cloudbuild.yaml"
 
 jobs:
-  build-and-submit:
+  push-and-submit:
     runs-on: ubuntu-latest
 
     permissions:
@@ -30,29 +24,19 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
-      - name: Build and Push Docker Image
-        id: build
+      - name: Set Container URI
+        id: container
         env:
           PROJECT_ID: ${{ secrets.PROJECT_ID }}
           REGION: ${{ secrets.REGION }}
           KAGGLE_COMPETITION_NAME: ${{ secrets.KAGGLE_COMPETITION_NAME }}
         run: |
-          # Get short commit SHA
-          SHORT_SHA=$(git rev-parse --short HEAD)
-          echo "short_sha=${SHORT_SHA}" >> $GITHUB_OUTPUT
-
-          # Build and push with Cloud Build
-          gcloud builds submit \
-            --config=cloudbuild.yaml \
-            --substitutions=_REGION=${REGION},_KAGGLE_COMPETITION_NAME=${KAGGLE_COMPETITION_NAME} \
-            --project=${PROJECT_ID}
-
-          # Set container URI with commit hash
-          CONTAINER_URI="${REGION}-docker.pkg.dev/${PROJECT_ID}/kaggle-competition-artifacts/${KAGGLE_COMPETITION_NAME}:${SHORT_SHA}"
+          # Use latest tag for submission
+          CONTAINER_URI="${REGION}-docker.pkg.dev/${PROJECT_ID}/kaggle-competition-artifacts/${KAGGLE_COMPETITION_NAME}:latest"
           echo "container_uri=${CONTAINER_URI}" >> $GITHUB_OUTPUT
           echo "Container URI: ${CONTAINER_URI}"
 
-      - name: Submit to Kaggle via Vertex AI
+      - name: Push Artifacts via Vertex AI
         env:
           PROJECT_ID: ${{ secrets.PROJECT_ID }}
           REGION: ${{ secrets.REGION }}
@@ -60,17 +44,42 @@ jobs:
           KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
           KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
           KAGGLE_COMPETITION_NAME: ${{ secrets.KAGGLE_COMPETITION_NAME }}
-          CONTAINER_URI: ${{ steps.build.outputs.container_uri }}
+          CONTAINER_URI: ${{ steps.container.outputs.container_uri }}
         run: |
-          echo "Submitting via Vertex AI Custom Job..."
+          echo "Pushing artifacts via Vertex AI Custom Job..."
           echo "Container URI: ${CONTAINER_URI}"
 
           gcloud ai custom-jobs create \
             --project=${PROJECT_ID} \
             --region=${REGION} \
-            --display-name="kaggle-submission-$(date +%Y%m%d-%H%M%S)" \
+            --display-name="kaggle-push-artifacts-$(date +%Y%m%d-%H%M%S)" \
             --worker-pool-spec=machine-type=n1-standard-4,replica-count=1,container-image-uri=${CONTAINER_URI} \
-            --args="python,-m,src.submit" \
+            --args="python,-m,src.kaggle_ops.push,push-artifacts,--run-env=vertex" \
             --env-vars="BUCKET_NAME=${BUCKET_NAME},KAGGLE_USERNAME=${KAGGLE_USERNAME},KAGGLE_KEY=${KAGGLE_KEY},KAGGLE_COMPETITION_NAME=${KAGGLE_COMPETITION_NAME}"
 
-          echo "Vertex AI Custom Job submitted successfully with commit ${{ steps.build.outputs.short_sha }}"
+          echo "Artifacts push job submitted successfully"
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install uv
+          uv pip install --system kaggle
+
+      - name: Push Code to Kaggle
+        env:
+          KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+          KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+          KAGGLE_COMPETITION_NAME: ${{ secrets.KAGGLE_COMPETITION_NAME }}
+        run: |
+          echo "Pushing code to Kaggle..."
+          uv run python -m src.kaggle_ops.upload codes --run-env=local
+          sleep 30
+
+      - name: Submit to Kaggle
+        run: |
+          echo "Submitting to Kaggle..."
+          cd codes/submission && kaggle k push

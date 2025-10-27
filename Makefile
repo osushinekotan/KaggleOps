@@ -36,13 +36,34 @@ train-local: pull-data
 	@echo "Training completed and results pushed to GCS"
 script ?= src/train.py
 
+.PHONY: push-arts-local
+push-arts-local:
+ifndef BUCKET_NAME
+	$(error BUCKET_NAME is not set)
+endif
+	$(MAKE) pull-data
+	python -m src.kaggle_ops.push push-artifacts --run-env=local
+	@echo "Artifacts pushed successfully"
+
+.PHONY: push-code-local
+push-code-local:
+	python -m src.kaggle_ops.upload codes --run-env=local
+	@echo "Code pushed successfully"
+
+.PHONY: push-sub
+push-sub:
+	@echo "Pushing submission to Kaggle..."
+	cd codes/submission && kaggle k push
+	@echo "Submission pushed successfully"
+
 .PHONY: submit-local
 submit-local:
 ifndef BUCKET_NAME
 	$(error BUCKET_NAME is not set)
 endif
-	$(MAKE) pull-data
-	python -m src.submit
+	$(MAKE) push-arts-local
+	$(MAKE) push-code-local
+	$(MAKE) push-sub
 	@echo "Submission completed"
 
 .PHONY: train-vertex
@@ -70,8 +91,8 @@ endif
 		--args="python,$(script)" \
 		--env-vars="BUCKET_NAME=$(BUCKET_NAME),KAGGLE_USERNAME=$(KAGGLE_USERNAME),KAGGLE_KEY=$(KAGGLE_KEY),KAGGLE_COMPETITION_NAME=$(KAGGLE_COMPETITION_NAME)"
 
-.PHONY: submit-vertex
-submit-vertex: push-image
+.PHONY: push-arts-vertex
+push-arts-vertex: push-image
 ifndef BUCKET_NAME
 	$(error BUCKET_NAME is not set)
 endif
@@ -81,14 +102,24 @@ endif
 ifndef REGION
 	$(error REGION is not set)
 endif
-	@echo "Submitting via Vertex AI Custom Job..."
+	@echo "Pushing artifacts via Vertex AI Custom Job..."
 	gcloud ai custom-jobs create \
 		--project=$(PROJECT_ID) \
 		--region=$(REGION) \
-		--display-name="kaggle-submission-$(shell date +%Y%m%d-%H%M%S)" \
+		--display-name="kaggle-push-artifacts-$(shell date +%Y%m%d-%H%M%S)" \
 		--worker-pool-spec=machine-type=n1-standard-4,replica-count=1,container-image-uri=$(CONTAINER_URI_LATEST) \
-		--args="python,-m,src.submit" \
+		--args="python,-m,src.kaggle_ops.push,push-artifacts,--run-env=vertex" \
 		--env-vars="BUCKET_NAME=$(BUCKET_NAME),KAGGLE_USERNAME=$(KAGGLE_USERNAME),KAGGLE_KEY=$(KAGGLE_KEY),KAGGLE_COMPETITION_NAME=$(KAGGLE_COMPETITION_NAME)"
+
+.PHONY: submit-vertex
+submit-vertex:
+ifndef BUCKET_NAME
+	$(error BUCKET_NAME is not set)
+endif
+	$(MAKE) push-arts-vertex
+	$(MAKE) push-code-local
+	$(MAKE) push-sub
+	@echo "Submission via Vertex AI completed"
 
 .PHONY: push-deps
 push-deps:
