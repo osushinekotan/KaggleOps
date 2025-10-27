@@ -43,5 +43,5 @@
       ]
     }
   },
-  "postCreateCommand": "uv pip install -r pyproject.toml --system"
+  "postCreateCommand": "bash .devcontainer/post-create.sh"
 }
