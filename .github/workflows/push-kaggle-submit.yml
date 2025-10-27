@@ -54,7 +54,7 @@ jobs:
             --region=${REGION} \
             --display-name="kaggle-push-artifacts-$(date +%Y%m%d-%H%M%S)" \
             --worker-pool-spec=machine-type=n1-standard-4,replica-count=1,container-image-uri=${CONTAINER_URI} \
-            --args="python,-m,src.kaggle_ops.push,push-artifacts,--run-env=vertex" \
+            --args="python,-m,src.kaggle_ops.push,--run-env,vertex" \
             --env-vars="BUCKET_NAME=${BUCKET_NAME},KAGGLE_USERNAME=${KAGGLE_USERNAME},KAGGLE_KEY=${KAGGLE_KEY},KAGGLE_COMPETITION_NAME=${KAGGLE_COMPETITION_NAME}"
 
           echo "Artifacts push job submitted successfully"
@@ -69,6 +69,15 @@ jobs:
           pip install uv
           uv pip install --system kaggle
 
+      - name: Setup Kaggle credentials
+        env:
+          KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+          KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+        run: |
+          mkdir -p ~/.kaggle
+          echo "{\"username\":\"${KAGGLE_USERNAME}\",\"key\":\"${KAGGLE_KEY}\"}" > ~/.kaggle/kaggle.json
+          chmod 600 ~/.kaggle/kaggle.json
+
       - name: Push Code to Kaggle
         env:
           KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
@@ -76,8 +85,7 @@ jobs:
           KAGGLE_COMPETITION_NAME: ${{ secrets.KAGGLE_COMPETITION_NAME }}
         run: |
           echo "Pushing code to Kaggle..."
-          uv run python -m src.kaggle_ops.upload codes --run-env=local
-          sleep 30
+          uv run python -m src.kaggle_ops.upload codes --settings.run-env local
 
       - name: Submit to Kaggle
         run: |

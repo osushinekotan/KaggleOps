@@ -4,8 +4,7 @@ import time
 from pathlib import Path
 
 import dotenv
-from pydantic import BaseModel, Field
-from tyro.extras import SubcommandApp
+import tyro
 
 from ..settings import SUBMISSION_CODE_DIR, KaggleSettings
 from .check import CheckNecessaryArtifactsSettings, nessesary_artifacts_exist
@@ -15,8 +14,6 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
 dotenv.load_dotenv()
-
-app = SubcommandApp()
 
 
 def parse_exp_names_from_kernel_metadata(kernel_metadata_path: Path) -> list[str]:
@@ -49,18 +46,7 @@ def parse_exp_names_from_kernel_metadata(kernel_metadata_path: Path) -> list[str
     return exp_names
 
 
-class PushArtifactsSettings(BaseModel):
-    """Settings for pushing artifacts to Kaggle."""
-
-    run_env: str = Field("local", description="Environment type: 'local' or 'vertex'")
-    kaggle_settings: KaggleSettings = Field(
-        default_factory=lambda: KaggleSettings(),  # type: ignore
-        description="Kaggle settings for the push process.",
-    )
-
-
-@app.command()
-def push_artifacts(settings: PushArtifactsSettings) -> None:
+def push_artifacts(run_env: str = "local") -> None:
     """
     Upload artifacts to Kaggle for all experiments listed in kernel-metadata.json.
 
@@ -69,8 +55,14 @@ def push_artifacts(settings: PushArtifactsSettings) -> None:
     2. Uploads artifacts for each experiment
     3. Waits 60s for processing
     4. Checks that all necessary artifacts exist
+
+    Args:
+        run_env: Environment type: 'local' or 'vertex'
     """
-    print(f"Running in {settings.run_env} environment")
+    print(f"Running in {run_env} environment")
+
+    # Initialize Kaggle settings
+    kaggle_settings = KaggleSettings()  # type: ignore
 
     # Parse exp_names from kernel-metadata.json
     kernel_metadata_path = SUBMISSION_CODE_DIR / "kernel-metadata.json"
@@ -87,7 +79,7 @@ def push_artifacts(settings: PushArtifactsSettings) -> None:
     for exp_name in exp_names:
         print(f"Uploading artifacts: {exp_name}")
         artifact_settings = UploadArtifactSettings(
-            exp_name=exp_name, run_env=settings.run_env, kaggle_settings=settings.kaggle_settings
+            exp_name=exp_name, run_env=run_env, kaggle_settings=kaggle_settings
         )
         artifacts(artifact_settings)
 
@@ -96,7 +88,7 @@ def push_artifacts(settings: PushArtifactsSettings) -> None:
 
     # Check necessary artifacts exist
     print("Checking artifacts...")
-    check_settings = CheckNecessaryArtifactsSettings(kaggle_settings=settings.kaggle_settings)
+    check_settings = CheckNecessaryArtifactsSettings(kaggle_settings=kaggle_settings)
     if not nessesary_artifacts_exist(check_settings):
         raise RuntimeError("Necessary artifacts do not exist. Cannot proceed with submission.")
 
@@ -107,10 +99,10 @@ if __name__ == "__main__":
     """Run the push commands.
 
     Help:
-    >>> uv run python -m src.kaggle_ops.push push-artifacts -h
+    >>> uv run python -m src.kaggle_ops.push --help
 
     Example:
-    >>> uv run python -m src.kaggle_ops.push push-artifacts --run-env=local
-    >>> uv run python -m src.kaggle_ops.push push-artifacts --run-env=vertex
+    >>> uv run python -m src.kaggle_ops.push --run-env local
+    >>> uv run python -m src.kaggle_ops.push --run-env vertex
     """
-    app.cli()
+    tyro.cli(push_artifacts)
