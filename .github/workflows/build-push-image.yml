@@ -46,6 +46,7 @@ jobs:
           # Build and push with Cloud Build
           gcloud builds submit \
             --config=cloudbuild.yaml \
+            --timeout=20m \
             --substitutions=_REGION=${REGION},_KAGGLE_COMPETITION_NAME=${KAGGLE_COMPETITION_NAME},SHORT_SHA=${SHORT_SHA} \
             --project=${PROJECT_ID}
 
