@@ -108,11 +108,16 @@ endif
 	@echo "Experiment names: $(EXP_NAMES)"
 	@echo "Pushing artifacts via Vertex AI Custom Job..."
 	@export EXP_NAMES=$(EXP_NAMES) && envsubst < configs/vertex/push-artifacts-job.yaml > /tmp/vertex-push-artifacts-job.yaml
-	gcloud ai custom-jobs create \
+	$(eval JOB_ID := $(shell gcloud ai custom-jobs create \
 		--project=$(PROJECT_ID) \
 		--region=$(REGION) \
 		--display-name="kaggle-push-artifacts-$(shell date +%Y%m%d-%H%M%S)" \
-		--config=/tmp/vertex-push-artifacts-job.yaml
+		--config=/tmp/vertex-push-artifacts-job.yaml \
+		--format="value(name)"))
+	@echo "Created Vertex AI job: $(JOB_ID)"
+	@echo "Waiting for job completion..."
+	./scripts/wait-for-vertex-job.sh "$(JOB_ID)" "$(PROJECT_ID)" "$(REGION)"
+	@echo "Artifacts pushed successfully"
 
 .PHONY: submit-vertex
 submit-vertex:

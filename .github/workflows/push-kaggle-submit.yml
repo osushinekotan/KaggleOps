@@ -24,6 +24,20 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          uv pip install --system tyro python-dotenv pydantic kaggle
+
       - name: Set Container URI
         id: container
         env:
@@ -31,12 +45,19 @@ jobs:
           REGION: ${{ secrets.REGION }}
           KAGGLE_COMPETITION_NAME: ${{ secrets.KAGGLE_COMPETITION_NAME }}
         run: |
-          # Use latest tag for submission
           CONTAINER_URI="${REGION}-docker.pkg.dev/${PROJECT_ID}/kaggle-competition-artifacts/${KAGGLE_COMPETITION_NAME}:latest"
           echo "container_uri=${CONTAINER_URI}" >> $GITHUB_OUTPUT
           echo "Container URI: ${CONTAINER_URI}"
 
+      - name: Parse Experiment Names
+        id: parse_exp_names
+        run: |
+          EXP_NAMES=$(uv run python -m src.kaggle_ops.parse_exp_names)
+          echo "exp_names=${EXP_NAMES}" >> $GITHUB_OUTPUT
+          echo "Experiment names: ${EXP_NAMES}"
+
       - name: Push Artifacts via Vertex AI
+        id: push_artifacts
         env:
           PROJECT_ID: ${{ secrets.PROJECT_ID }}
           REGION: ${{ secrets.REGION }}
@@ -45,31 +66,37 @@ jobs:
           KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
           KAGGLE_COMPETITION_NAME: ${{ secrets.KAGGLE_COMPETITION_NAME }}
           CONTAINER_URI: ${{ steps.container.outputs.container_uri }}
+          EXP_NAMES: ${{ steps.parse_exp_names.outputs.exp_names }}
         run: |
           echo "Pushing artifacts via Vertex AI Custom Job..."
           echo "Container URI: ${CONTAINER_URI}"
+          echo "Experiment names: ${EXP_NAMES}"
 
           # Generate config file from template
           export CONTAINER_URI_LATEST=${CONTAINER_URI}
           envsubst < configs/vertex/push-artifacts-job.yaml > /tmp/vertex-push-artifacts-job.yaml
 
-          gcloud ai custom-jobs create \
+          # Create job and capture job ID
+          JOB_ID=$(gcloud ai custom-jobs create \
             --project=${PROJECT_ID} \
             --region=${REGION} \
             --display-name="kaggle-push-artifacts-$(date +%Y%m%d-%H%M%S)" \
-            --config=/tmp/vertex-push-artifacts-job.yaml
+            --config=/tmp/vertex-push-artifacts-job.yaml \
+            --format="value(name)")
 
-          echo "Artifacts push job submitted successfully"
+          echo "Created Vertex AI job: ${JOB_ID}"
+          echo "job_id=${JOB_ID}" >> $GITHUB_OUTPUT
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.11"
-
-      - name: Install dependencies
+      - name: Wait for Artifacts Push Job
+        env:
+          PROJECT_ID: ${{ secrets.PROJECT_ID }}
+          REGION: ${{ secrets.REGION }}
         run: |
-          pip install uv
-          uv pip install --system kaggle
+          echo "Waiting for Vertex AI job to complete..."
+          ./scripts/wait-for-vertex-job.sh \
+            "${{ steps.push_artifacts.outputs.job_id }}" \
+            "${PROJECT_ID}" \
+            "${REGION}"
 
       - name: Push Code to Kaggle
         env:
