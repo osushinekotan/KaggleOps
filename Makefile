@@ -1,5 +1,7 @@
 -include .env
 
+export PYTHONUNBUFFERED=1
+
 GIT_COMMIT := $(shell git rev-parse --short HEAD)
 CONTAINER_URI_BASE := $(REGION)-docker.pkg.dev/$(PROJECT_ID)/kaggle-competition-artifacts/$(KAGGLE_COMPETITION_NAME)
 CONTAINER_URI_COMMIT := $(CONTAINER_URI_BASE):$(GIT_COMMIT)
@@ -98,8 +100,8 @@ pull-data:
 ifndef BUCKET_NAME
 	$(error BUCKET_NAME is not set)
 endif
-	@echo "Syncing from GCS to local (GCS is source of truth)..."
-	gcloud storage rsync -r gs://$(BUCKET_NAME) ./data
+	@echo "Syncing from GCS to local (no clobber sync)..."
+	gcloud storage rsync -r --no-clobber gs://$(BUCKET_NAME) ./data
 	@echo "Pull from GCS completed"
 
 .PHONY: push-data
@@ -107,8 +109,8 @@ push-data:
 ifndef BUCKET_NAME
 	$(error BUCKET_NAME is not set)
 endif
-	@echo "Syncing from local to GCS..."
-	gcloud storage rsync -r ./data gs://$(BUCKET_NAME)
+	@echo "Syncing from local to GCS... (no clobber sync)"
+	gcloud storage rsync -r --no-clobber ./data gs://$(BUCKET_NAME)
 	@echo "Push to GCS completed"
 
 .PHONY: push-image
