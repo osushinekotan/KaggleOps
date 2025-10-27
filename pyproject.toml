@@ -9,7 +9,6 @@ dependencies = [
     "mypy>=1.12.0",
     "pre-commit>=4.0.1",
     "rootutils>=1.0.7",
-    "google-cloud-aiplatform>=1.70.0",
 ]
 
 [tool.ruff]
