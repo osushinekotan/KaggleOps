@@ -2,6 +2,8 @@ name: Push Artifacts and Submit to Kaggle
 
 on:
   workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize]
 
 jobs:
   push-and-submit:
@@ -35,9 +37,36 @@ jobs:
           enable-cache: true
 
       - name: Install dependencies
-        run: uv pip install tyro python-dotenv pydantic kaggle
+        run: uv pip install tyro python-dotenv pydantic kaggle nbformat
         env:
           UV_SYSTEM_PYTHON: 1
+
+      - name: Check if requirements.txt changed
+        id: check_deps
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "Skipping requirements.txt check for manual workflow dispatch"
+          elif [ "${{ github.event_name }}" == "pull_request" ]; then
+            if git diff --name-only origin/${{ github.base_ref }}...${{ github.sha }} | grep -q "codes/deps/requirements.txt"; then
+              echo "changed=true" >> $GITHUB_OUTPUT
+              echo "requirements.txt has changed"
+            else
+              echo "changed=false" >> $GITHUB_OUTPUT
+              echo "requirements.txt has not changed"
+            fi
+          else
+            echo "changed=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Push dependencies to Kaggle
+        if: steps.check_deps.outputs.changed == 'true'
+        env:
+          KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+          KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+          KAGGLE_COMPETITION_NAME: ${{ secrets.KAGGLE_COMPETITION_NAME }}
+          UV_SYSTEM_PYTHON: 1
+        run: make push-deps
 
       - name: Set Container URI
         id: container
