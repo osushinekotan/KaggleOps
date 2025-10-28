@@ -30,6 +30,9 @@ IGNORE_PATTERNS = [
     "notebooks",
     "tests",
     "terraform",
+    "cloudbuild.yaml",
+    "Makefile",
+    "Dockerfile",
 ]
 
 
