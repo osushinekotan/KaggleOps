@@ -83,9 +83,7 @@ def push_artifacts(run_env: str = "local", exp_names: str = "") -> None:
     # Upload artifacts for each exp_name
     for exp_name in exp_names_list:
         print(f"Uploading artifacts: {exp_name}")
-        artifact_settings = UploadArtifactSettings(
-            exp_name=exp_name, run_env=run_env, kaggle_settings=kaggle_settings
-        )
+        artifact_settings = UploadArtifactSettings(exp_name=exp_name, run_env=run_env, kaggle_settings=kaggle_settings)
         artifacts(artifact_settings)
 
     print("All artifacts uploaded successfully")
@@ -101,9 +99,5 @@ if __name__ == "__main__":
     >>> uv run python -m src.kaggle_ops.push --run-env local
     >>> uv run python -m src.kaggle_ops.push --run-env vertex
     """
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(levelname)s: %(message)s',
-        force=True
-    )
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s", force=True)
     tyro.cli(push_artifacts)

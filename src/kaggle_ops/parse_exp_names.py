@@ -53,11 +53,7 @@ if __name__ == "__main__":
     >>> uv run python -m src.kaggle_ops.parse_exp_names
     >>> uv run python -m src.kaggle_ops.parse_exp_names --kernel-metadata-path /path/to/kernel-metadata.json
     """
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(levelname)s: %(message)s',
-        force=True
-    )
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s", force=True)
     exp_names = tyro.cli(parse_exp_names)
     # Output as comma-separated for easy shell consumption
     print(",".join(exp_names))

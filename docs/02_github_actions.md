@@ -32,6 +32,7 @@ gh auth login
 ```
 
 This sets all required secrets from `.env`:
+
 - `PROJECT_ID`
 - `REGION`
 - `BUCKET_NAME`
