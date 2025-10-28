@@ -56,18 +56,19 @@ push-sub:
 	cd codes/submission && kaggle k push
 	@echo "Submission pushed successfully"
 
+push_deps ?= true
+
 .PHONY: submit-local
 submit-local:
 ifndef BUCKET_NAME
 	$(error BUCKET_NAME is not set)
 endif
-	$(eval push_deps ?= true)
-ifeq ($(push_deps),true)
-	@echo "Pushing dependencies to Kaggle..."
-	$(MAKE) push-deps
-else
-	@echo "Skipping push-deps (push_deps=$(push_deps))"
-endif
+	@if [ "$(push_deps)" = "true" ]; then \
+		echo "Pushing dependencies to Kaggle..."; \
+		$(MAKE) push-deps; \
+	else \
+		echo "Skipping push-deps (push_deps=$(push_deps))"; \
+	fi
 	$(MAKE) push-arts-local
 	$(MAKE) push-code-local
 	@echo "Waiting for artifacts to process..."
@@ -75,11 +76,12 @@ endif
 	$(MAKE) push-sub
 	@echo "Submission completed"
 
+script ?= src/train.py
+push_image ?= true
+machine_type ?= n1-standard-4
+
 .PHONY: train-vertex
 train-vertex:
-	$(eval script ?= src/train.py)
-	$(eval push_image ?= true)
-	$(eval machine_type ?= n1-standard-4)
 ifndef PROJECT_ID
 	$(error PROJECT_ID is not set)
 endif
@@ -89,12 +91,12 @@ endif
 ifndef BUCKET_NAME
 	$(error BUCKET_NAME is not set)
 endif
-ifeq ($(push_image),true)
-	@echo "Pushing Docker image..."
-	$(MAKE) push-image
-else
-	@echo "Skipping push-image (push_image=$(push_image))"
-endif
+	@if [ "$(push_image)" = "true" ]; then \
+		echo "Pushing Docker image..."; \
+		$(MAKE) push-image; \
+	else \
+		echo "Skipping push-image (push_image=$(push_image))"; \
+	fi
 	@echo "Running training script via Vertex AI Custom Job: $(script)"
 	@echo "Machine type: $(machine_type)"
 	@export SCRIPT=$(script) MACHINE_TYPE=$(machine_type) && envsubst < configs/vertex/training-job.yaml > /tmp/vertex-training-job.yaml
@@ -136,13 +138,12 @@ submit-vertex:
 ifndef BUCKET_NAME
 	$(error BUCKET_NAME is not set)
 endif
-	$(eval push_deps ?= true)
-ifeq ($(push_deps),true)
-	@echo "Pushing dependencies to Kaggle..."
-	$(MAKE) push-deps
-else
-	@echo "Skipping push-deps (push_deps=$(push_deps))"
-endif
+	@if [ "$(push_deps)" = "true" ]; then \
+		echo "Pushing dependencies to Kaggle..."; \
+		$(MAKE) push-deps; \
+	else \
+		echo "Skipping push-deps (push_deps=$(push_deps))"; \
+	fi
 	$(MAKE) push-arts-vertex
 	$(MAKE) push-code-local
 	@echo "Waiting for artifacts to process..."
