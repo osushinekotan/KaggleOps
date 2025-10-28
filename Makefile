@@ -61,12 +61,12 @@ submit-local:
 ifndef BUCKET_NAME
 	$(error BUCKET_NAME is not set)
 endif
-	$(eval PUSH_DEPS ?= true)
-ifeq ($(PUSH_DEPS),true)
+	$(eval push_deps ?= true)
+ifeq ($(push_deps),true)
 	@echo "Pushing dependencies to Kaggle..."
 	$(MAKE) push-deps
 else
-	@echo "Skipping push-deps (PUSH_DEPS=$(PUSH_DEPS))"
+	@echo "Skipping push-deps (push_deps=$(push_deps))"
 endif
 	$(MAKE) push-arts-local
 	$(MAKE) push-code-local
@@ -76,10 +76,10 @@ endif
 	@echo "Submission completed"
 
 .PHONY: train-vertex
-train-vertex: push-image
-ifndef script
-	$(error script is not set. Example: make train-vertex script=src/train.py)
-endif
+train-vertex:
+	$(eval script ?= src/train.py)
+	$(eval push_image ?= true)
+	$(eval machine_type ?= n1-standard-4)
 ifndef PROJECT_ID
 	$(error PROJECT_ID is not set)
 endif
@@ -89,10 +89,15 @@ endif
 ifndef BUCKET_NAME
 	$(error BUCKET_NAME is not set)
 endif
-	$(eval MACHINE_TYPE ?= n1-standard-4)
+ifeq ($(push_image),true)
+	@echo "Pushing Docker image..."
+	$(MAKE) push-image
+else
+	@echo "Skipping push-image (push_image=$(push_image))"
+endif
 	@echo "Running training script via Vertex AI Custom Job: $(script)"
-	@echo "Machine type: $(MACHINE_TYPE)"
-	@export SCRIPT=$(script) && envsubst < configs/vertex/training-job.yaml > /tmp/vertex-training-job.yaml
+	@echo "Machine type: $(machine_type)"
+	@export SCRIPT=$(script) MACHINE_TYPE=$(machine_type) && envsubst < configs/vertex/training-job.yaml > /tmp/vertex-training-job.yaml
 	gcloud ai custom-jobs create \
 		--project=$(PROJECT_ID) \
 		--region=$(REGION) \
@@ -131,12 +136,12 @@ submit-vertex:
 ifndef BUCKET_NAME
 	$(error BUCKET_NAME is not set)
 endif
-	$(eval PUSH_DEPS ?= true)
-ifeq ($(PUSH_DEPS),true)
+	$(eval push_deps ?= true)
+ifeq ($(push_deps),true)
 	@echo "Pushing dependencies to Kaggle..."
 	$(MAKE) push-deps
 else
-	@echo "Skipping push-deps (PUSH_DEPS=$(PUSH_DEPS))"
+	@echo "Skipping push-deps (push_deps=$(push_deps))"
 endif
 	$(MAKE) push-arts-vertex
 	$(MAKE) push-code-local
