@@ -61,7 +61,13 @@ submit-local:
 ifndef BUCKET_NAME
 	$(error BUCKET_NAME is not set)
 endif
+	$(eval PUSH_DEPS ?= true)
+ifeq ($(PUSH_DEPS),true)
+	@echo "Pushing dependencies to Kaggle..."
 	$(MAKE) push-deps
+else
+	@echo "Skipping push-deps (PUSH_DEPS=$(PUSH_DEPS))"
+endif
 	$(MAKE) push-arts-local
 	$(MAKE) push-code-local
 	@echo "Waiting for artifacts to process..."
@@ -125,7 +131,13 @@ submit-vertex:
 ifndef BUCKET_NAME
 	$(error BUCKET_NAME is not set)
 endif
+	$(eval PUSH_DEPS ?= true)
+ifeq ($(PUSH_DEPS),true)
+	@echo "Pushing dependencies to Kaggle..."
 	$(MAKE) push-deps
+else
+	@echo "Skipping push-deps (PUSH_DEPS=$(PUSH_DEPS))"
+endif
 	$(MAKE) push-arts-vertex
 	$(MAKE) push-code-local
 	@echo "Waiting for artifacts to process..."

@@ -127,6 +127,7 @@ jobs:
             "${{ steps.push_artifacts.outputs.job_id }}" \
             "${PROJECT_ID}" \
             "${REGION}"
+          sleep 60
 
       - name: Push Code to Kaggle
         env:
