@@ -116,7 +116,7 @@ endif
 		--format="value(name)"))
 	@echo "Created Vertex AI job: $(JOB_ID)"
 	@echo "Waiting for job completion..."
-	./scripts/wait-for-vertex-job.sh "$(JOB_ID)" "$(PROJECT_ID)" "$(REGION)"
+	./scripts/wait_for_vertex_job.sh "$(JOB_ID)" "$(PROJECT_ID)" "$(REGION)"
 	@echo "Artifacts pushed successfully"
 
 .PHONY: submit-vertex

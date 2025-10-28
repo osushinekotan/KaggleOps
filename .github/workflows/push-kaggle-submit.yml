@@ -93,7 +93,7 @@ jobs:
           REGION: ${{ secrets.REGION }}
         run: |
           echo "Waiting for Vertex AI job to complete..."
-          ./scripts/wait-for-vertex-job.sh \
+          ./scripts/wait_for_vertex_job.sh \
             "${{ steps.push_artifacts.outputs.job_id }}" \
             "${PROJECT_ID}" \
             "${REGION}"
