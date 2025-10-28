@@ -11,7 +11,6 @@ from pydantic import BaseModel, Field
 from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import StratifiedKFold
 
-from src.kaggle_ops.utils.utils import get_default_exp_name
 from src.settings import DirectorySettings
 
 
@@ -144,7 +143,7 @@ if __name__ == "__main__":
     import rootutils
 
     rootutils.setup_root(".", cwd=True)
-    config = Config(name=get_default_exp_name())
+    config = Config(name="spaceship-titanic")
     settings = DirectorySettings(exp_name=config.name)
 
     # %%
