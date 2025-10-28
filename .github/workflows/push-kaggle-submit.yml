@@ -24,19 +24,20 @@ jobs:
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
-      - name: Install uv
-        uses: astral-sh/setup-uv@v5
-        with:
-          enable-cache: true
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
       - name: Install dependencies
-        run: |
-          uv pip install --system tyro python-dotenv pydantic kaggle
+        run: uv pip install tyro python-dotenv pydantic kaggle
+        env:
+          UV_SYSTEM_PYTHON: 1
 
       - name: Set Container URI
         id: container
