@@ -61,6 +61,7 @@ submit-local:
 ifndef BUCKET_NAME
 	$(error BUCKET_NAME is not set)
 endif
+	$(MAKE) push-deps
 	$(MAKE) push-arts-local
 	$(MAKE) push-code-local
 	@echo "Waiting for artifacts to process..."
@@ -124,6 +125,7 @@ submit-vertex:
 ifndef BUCKET_NAME
 	$(error BUCKET_NAME is not set)
 endif
+	$(MAKE) push-deps
 	$(MAKE) push-arts-vertex
 	$(MAKE) push-code-local
 	@echo "Waiting for artifacts to process..."
