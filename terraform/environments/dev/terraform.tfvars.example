@@ -25,7 +25,8 @@ service_accounts = {
       "roles/artifactregistry.writer",
       "roles/storage.objectAdmin",
       "roles/aiplatform.user",
-      "roles/iam.serviceAccountUser"
+      "roles/iam.serviceAccountUser",
+      "roles/viewer"
     ]
   }
 }
