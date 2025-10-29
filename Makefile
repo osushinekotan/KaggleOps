@@ -92,6 +92,7 @@ endif
 ifndef BUCKET_NAME
 	$(error BUCKET_NAME is not set)
 endif
+	@echo "CONTAINER_URI_COMMIT: $(CONTAINER_URI_COMMIT)"
 	@if [ "$(push_image)" = "true" ]; then \
 		echo "Pushing Docker image..."; \
 		$(MAKE) push-image; \
@@ -101,16 +102,18 @@ endif
 	@echo "Running training script via Vertex AI Custom Job: $(script)"
 	@echo "Machine type: $(machine_type)"
 	@echo "CONTAINER_URI_COMMIT: $(CONTAINER_URI_COMMIT)"
-	@export SCRIPT=$(script) MACHINE_TYPE=$(machine_type) && envsubst < configs/vertex/training-job.yaml > /tmp/vertex-training-job.yaml
-	$(eval JOB_ID := $(shell gcloud ai custom-jobs create \
+	@export SCRIPT=$(script) MACHINE_TYPE=$(machine_type) CONTAINER_URI_COMMIT=$(CONTAINER_URI_COMMIT) && envsubst < configs/vertex/training-job.yaml > /tmp/vertex-training-job.yaml
+	@cat /tmp/vertex-training-job.yaml
+	@echo "Creating Vertex AI job..."
+	@JOB_ID=$$(gcloud ai custom-jobs create \
 		--project=$(PROJECT_ID) \
 		--region=$(REGION) \
-		--display-name="kaggle-training-$(shell date +%Y%m%d-%H%M%S)" \
+		--display-name="kaggle-training-$$(date +%Y%m%d-%H%M%S)" \
 		--config=/tmp/vertex-training-job.yaml \
-		--format="value(name)"))
-	@echo "Created Vertex AI job: $(JOB_ID)"
-	@echo "Waiting for job completion..."
-	./scripts/wait_for_vertex_job.sh "$(JOB_ID)" "$(PROJECT_ID)" "$(REGION)"
+		--format="value(name)") && \
+	echo "Created Vertex AI job: $$JOB_ID" && \
+	echo "Waiting for job completion..." && \
+	./scripts/wait_for_vertex_job.sh "$$JOB_ID" "$(PROJECT_ID)" "$(REGION)"
 	@echo "Training completed"
 
 .PHONY: push-arts-vertex
@@ -128,16 +131,18 @@ endif
 	$(eval EXP_NAMES := $(shell python -m src.kaggle_ops.parse_exp_names))
 	@echo "Experiment names: $(EXP_NAMES)"
 	@echo "Pushing artifacts via Vertex AI Custom Job..."
-	@export EXP_NAMES=$(EXP_NAMES) && envsubst < configs/vertex/push-artifacts-job.yaml > /tmp/vertex-push-artifacts-job.yaml
-	$(eval JOB_ID := $(shell gcloud ai custom-jobs create \
+	@export EXP_NAMES=$(EXP_NAMES) CONTAINER_URI_LATEST=$(CONTAINER_URI_LATEST) BUCKET_NAME=$(BUCKET_NAME) KAGGLE_USERNAME=$(KAGGLE_USERNAME) KAGGLE_KEY=$(KAGGLE_KEY) KAGGLE_COMPETITION_NAME=$(KAGGLE_COMPETITION_NAME) && envsubst < configs/vertex/push-artifacts-job.yaml > /tmp/vertex-push-artifacts-job.yaml
+	@cat /tmp/vertex-push-artifacts-job.yaml
+	@echo "Creating Vertex AI job..."
+	@JOB_ID=$$(gcloud ai custom-jobs create \
 		--project=$(PROJECT_ID) \
 		--region=$(REGION) \
-		--display-name="kaggle-push-artifacts-$(shell date +%Y%m%d-%H%M%S)" \
+		--display-name="kaggle-push-artifacts-$$(date +%Y%m%d-%H%M%S)" \
 		--config=/tmp/vertex-push-artifacts-job.yaml \
-		--format="value(name)"))
-	@echo "Created Vertex AI job: $(JOB_ID)"
-	@echo "Waiting for job completion..."
-	./scripts/wait_for_vertex_job.sh "$(JOB_ID)" "$(PROJECT_ID)" "$(REGION)"
+		--format="value(name)") && \
+	echo "Created Vertex AI job: $$JOB_ID" && \
+	echo "Waiting for job completion..." && \
+	./scripts/wait_for_vertex_job.sh "$$JOB_ID" "$(PROJECT_ID)" "$(REGION)"
 	@echo "Artifacts pushed successfully"
 
 .PHONY: submit-vertex
