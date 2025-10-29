@@ -69,7 +69,7 @@ class VertexDirectorySettings(BaseSettings):
     INPUT_DIR: str = Field("/gcs/{bucket}/input", description="Input directory in Vertex AI environment.")
     ARTIFACT_DIR: str = Field("/gcs/{bucket}/output", description="Artifact directory in Vertex AI environment.")
     OUTPUT_DIR_TEMPLATE: str = Field(
-        "/gcs/{bucket}/output/{{exp_name}}/1", description="Output directory template in Vertex AI environment."
+        "/gcs/{bucket}/output/{exp_name}/1", description="Output directory template in Vertex AI environment."
     )
 
 
