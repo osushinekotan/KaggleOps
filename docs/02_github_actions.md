@@ -1,66 +1,47 @@
-# GitHub Actions Setup
+# GitHub Actions のセットアップ
 
-## Prerequisites
+## 前提条件
 
-- Deploy GCP resources with Terraform first (see [01_infra.md](01_infra.md))
-- Admin access to your GitHub repository
-- [GitHub CLI](https://cli.github.com/) installed
+- Terraform で GCP リソースをデプロイ済みであること ([01_infrastructure.md](01_infrastructure.md) を参照)
+- GitHub リポジトリへの管理者アクセス権があること
+- GitHub CLI がインストール済みであること
 
-## Setup Steps
+## セットアップ手順
 
-### 1. Apply Terraform
+### 1. Terraform の適用
 
-See [01_infra.md](01_infra.md) for infrastructure setup.
+インフラストラクチャのセットアップについては [01_infrastructure.md](01_infrastructure.md) を参照。
 
 ```bash
 cd terraform/environments/dev
 terraform output
 ```
 
-### 2. Configure GitHub Secrets
+### 2. GitHub Secrets の設定
 
-After adding Terraform outputs to your `.env` file (see [01_infra.md](01_infra.md)):
+Terraform の出力を .env ファイルに追加した後 ([01_infrastructure.md](01_infrastructure.md) を参照)、以下のいずれかの方法で GitHub Secrets を設定する。
 
-#### Option A: Automatic Setup (Recommended)
+#### 方法 A: 自動設定 (推奨)
 
 ```bash
-# Authenticate to GitHub CLI
+# GitHub CLI で認証
 gh auth login
 
-# Set all secrets from .env
+# .env からすべてのシークレットを設定
 ./scripts/set_github_secrets.sh
 ```
 
-This sets all required secrets from `.env`:
+このスクリプトは .env から以下のシークレットを設定する。
 
-- `PROJECT_ID`
-- `REGION`
-- `BUCKET_NAME`
-- `KAGGLE_USERNAME`
-- `KAGGLE_KEY`
-- `KAGGLE_COMPETITION_NAME`
-- `WIF_PROVIDER` (from Terraform output)
-- `WIF_SERVICE_ACCOUNT` (from Terraform output)
+- PROJECT_ID
+- REGION
+- BUCKET_NAME
+- KAGGLE_USERNAME
+- KAGGLE_KEY
+- KAGGLE_COMPETITION_NAME
+- WIF_PROVIDER (Terraform の出力から取得)
+- WIF_SERVICE_ACCOUNT (Terraform の出力から取得)
 
-#### Option B: Manual Setup
+#### 方法 B: 手動設定
 
-Go to `Settings` > `Secrets and variables` > `Actions` and manually add all secrets from your `.env` file.
-
-## Workflows
-
-### push-kaggle-deps.yml
-
-**Triggers:** Manual, or PR with changes to `codes/deps/requirements.txt`
-
-**What it does:** Pushes dependencies to Kaggle
-
-### build-push-image.yml
-
-**Triggers:** Manual, or push/PR with changes to `Dockerfile`, `src/**`, `pyproject.toml`, `cloudbuild.yaml`
-
-**What it does:** Builds Docker image with Cloud Build and pushes to Artifact Registry
-
-**Image tags:**
-
-- `${SHORT_SHA}` - Git commit hash
-- `latest`
+Settings > Secrets and variables > Actions に移動し、.env ファイルからすべてのシークレットを手動で追加する。
