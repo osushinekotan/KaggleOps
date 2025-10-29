@@ -103,7 +103,11 @@ jobs:
           echo "Experiment names: ${EXP_NAMES}"
 
           # Generate config file from template
-          export CONTAINER_URI_LATEST=${CONTAINER_URI}
+          export CONTAINER_URI_LATEST=${CONTAINER_URI} \
+            BUCKET_NAME=${BUCKET_NAME} \
+            KAGGLE_USERNAME=${KAGGLE_USERNAME} \
+            KAGGLE_KEY=${KAGGLE_KEY} \
+            KAGGLE_COMPETITION_NAME=${KAGGLE_COMPETITION_NAME}
           envsubst < configs/vertex/push-artifacts-job.yaml > /tmp/vertex-push-artifacts-job.yaml
 
           # Create job and capture job ID
