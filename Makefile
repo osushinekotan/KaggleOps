@@ -94,6 +94,8 @@ endif
 	@if [ "$(push_image)" = "true" ]; then \
 		echo "Pushing Docker image..."; \
 		$(MAKE) push-image; \
+		echo "Waiting for image to be pushed..."; \
+		sleep 60; \
 	else \
 		echo "Skipping push-image (push_image=$(push_image))"; \
 	fi
