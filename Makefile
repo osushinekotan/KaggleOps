@@ -100,6 +100,7 @@ endif
 	fi
 	@echo "Running training script via Vertex AI Custom Job: $(script)"
 	@echo "Machine type: $(machine_type)"
+	@echo "CONTAINER_URI_COMMIT: $(CONTAINER_URI_COMMIT)"
 	@export SCRIPT=$(script) MACHINE_TYPE=$(machine_type) && envsubst < configs/vertex/training-job.yaml > /tmp/vertex-training-job.yaml
 	$(eval JOB_ID := $(shell gcloud ai custom-jobs create \
 		--project=$(PROJECT_ID) \
