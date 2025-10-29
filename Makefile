@@ -100,11 +100,16 @@ endif
 	@echo "Running training script via Vertex AI Custom Job: $(script)"
 	@echo "Machine type: $(machine_type)"
 	@export SCRIPT=$(script) MACHINE_TYPE=$(machine_type) && envsubst < configs/vertex/training-job.yaml > /tmp/vertex-training-job.yaml
-	gcloud ai custom-jobs create \
+	$(eval JOB_ID := $(shell gcloud ai custom-jobs create \
 		--project=$(PROJECT_ID) \
 		--region=$(REGION) \
 		--display-name="kaggle-training-$(shell date +%Y%m%d-%H%M%S)" \
-		--config=/tmp/vertex-training-job.yaml
+		--config=/tmp/vertex-training-job.yaml \
+		--format="value(name)"))
+	@echo "Created Vertex AI job: $(JOB_ID)"
+	@echo "Waiting for job completion..."
+	./scripts/wait_for_vertex_job.sh "$(JOB_ID)" "$(PROJECT_ID)" "$(REGION)"
+	@echo "Training completed"
 
 .PHONY: push-arts-vertex
 push-arts-vertex:
