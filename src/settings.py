@@ -131,5 +131,6 @@ class DirectorySettings(BaseSettings):
         print(f"OUTPUT_DIR: {self.OUTPUT_DIR}")
         print(f"ARTIFACT_DIR: {self.ARTIFACT_DIR}")
         print(f"ARTIFACT_EXP_DIR: {self.ARTIFACT_EXP_DIR}")
+        print(f"COMP_DATASET_DIR: {self.COMP_DATASET_DIR}")
 
         return self
