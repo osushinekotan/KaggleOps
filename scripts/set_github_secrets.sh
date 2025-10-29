@@ -10,6 +10,9 @@ while IFS='=' read -r key value; do
   value="${value%\"}"
   value="${value#\"}"
 
-  echo "$value" | gh secret set "$key" --repo $GITHUB_REPO
+  # Trim whitespace
+  value=$(echo -n "$value" | tr -d '[:space:]')
+
+  echo -n "$value" | gh secret set "$key" --repo $GITHUB_REPO
   echo "✓ Set $key"
 done < .env
