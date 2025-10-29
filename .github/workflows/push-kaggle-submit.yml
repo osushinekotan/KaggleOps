@@ -37,9 +37,7 @@ jobs:
           enable-cache: true
 
       - name: Install dependencies
-        run: uv pip install tyro python-dotenv pydantic kaggle nbformat
-        env:
-          UV_SYSTEM_PYTHON: 1
+        run: uv pip install --system tyro python-dotenv pydantic kaggle nbformat
 
       - name: Check if requirements.txt changed
         id: check_deps
@@ -82,7 +80,7 @@ jobs:
       - name: Parse Experiment Names
         id: parse_exp_names
         run: |
-          EXP_NAMES=$(uv run python -m src.kaggle_ops.parse_exp_names)
+          EXP_NAMES=$(python -m src.kaggle_ops.parse_exp_names)
           echo "exp_names=${EXP_NAMES}" >> $GITHUB_OUTPUT
           echo "Experiment names: ${EXP_NAMES}"
 
@@ -140,7 +138,7 @@ jobs:
           KAGGLE_COMPETITION_NAME: ${{ secrets.KAGGLE_COMPETITION_NAME }}
         run: |
           echo "Pushing code to Kaggle..."
-          uv run python -m src.kaggle_ops.upload codes --settings.run-env local
+          python -m src.kaggle_ops.upload codes --settings.run-env local
 
       - name: Submit to Kaggle
         run: |
