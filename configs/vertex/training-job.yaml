@@ -3,7 +3,7 @@ workerPoolSpecs:
       machineType: ${MACHINE_TYPE}
     replicaCount: 1
     containerSpec:
-      imageUri: ${CONTAINER_URI_LATEST}
+      imageUri: ${CONTAINER_URI_COMMIT}
       args:
         - python
         - ${SCRIPT}

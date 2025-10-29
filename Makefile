@@ -6,6 +6,7 @@ CONTAINER_URI_COMMIT := $(CONTAINER_URI_BASE):$(GIT_COMMIT)
 CONTAINER_URI_LATEST := $(CONTAINER_URI_BASE):latest
 
 export CONTAINER_URI_LATEST
+export CONTAINER_URI_COMMIT
 
 .PHONY: setup
 setup:
@@ -94,8 +95,6 @@ endif
 	@if [ "$(push_image)" = "true" ]; then \
 		echo "Pushing Docker image..."; \
 		$(MAKE) push-image; \
-		echo "Waiting for image to be pushed..."; \
-		sleep 60; \
 	else \
 		echo "Skipping push-image (push_image=$(push_image))"; \
 	fi
