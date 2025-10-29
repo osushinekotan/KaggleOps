@@ -23,7 +23,9 @@ service_accounts = {
     roles = [
       "roles/cloudbuild.builds.builder",
       "roles/artifactregistry.writer",
-      "roles/storage.objectAdmin"
+      "roles/storage.objectAdmin",
+      "roles/aiplatform.user",
+      "roles/iam.serviceAccountUser"
     ]
   }
 }
