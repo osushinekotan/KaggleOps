@@ -129,6 +129,6 @@ class DirectorySettings(BaseSettings):
             raise ValueError(f"Invalid environment type. Must be 'local', 'kaggle', or 'vertex'. Got: {self.run_env}")
 
         print(f"OUTPUT_DIR: {self.OUTPUT_DIR}")
-        print(f"ARTIFACT_EXP_DIR: {self.ARTIFACT_EXP_DIR}")
+        print(f"ARTIFACT_DIR: {self.ARTIFACT_DIR}")
 
         return self
