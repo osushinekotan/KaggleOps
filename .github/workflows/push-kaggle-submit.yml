@@ -84,52 +84,45 @@ jobs:
           echo "exp_names=${EXP_NAMES}" >> $GITHUB_OUTPUT
           echo "Experiment names: ${EXP_NAMES}"
 
-      - name: Push Artifacts via Vertex AI
+      - name: Push Artifacts via Vertex AI and Wait
         id: push_artifacts
-        env:
-          PROJECT_ID: ${{ secrets.PROJECT_ID }}
-          REGION: ${{ secrets.REGION }}
-          BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
-          KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
-          KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
-          KAGGLE_COMPETITION_NAME: ${{ secrets.KAGGLE_COMPETITION_NAME }}
-          CONTAINER_URI: ${{ steps.container.outputs.container_uri }}
-          EXP_NAMES: ${{ steps.parse_exp_names.outputs.exp_names }}
-        run: |
-          echo "Pushing artifacts via Vertex AI Custom Job..."
-          echo "Container URI: ${CONTAINER_URI}"
-          echo "Experiment names: ${EXP_NAMES}"
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 60
+          max_attempts: 3
+          retry_wait_seconds: 120
+          shell: bash
+          command: |
+            echo "Pushing artifacts via Vertex AI Custom Job..."
+            echo "Container URI: ${{ steps.container.outputs.container_uri }}"
+            echo "Experiment names: ${{ steps.parse_exp_names.outputs.exp_names }}"
 
-          # Generate config file from template
-          export CONTAINER_URI_LATEST=${CONTAINER_URI} \
-            BUCKET_NAME=${BUCKET_NAME} \
-            KAGGLE_USERNAME=${KAGGLE_USERNAME} \
-            KAGGLE_KEY=${KAGGLE_KEY} \
-            KAGGLE_COMPETITION_NAME=${KAGGLE_COMPETITION_NAME}
-          envsubst < configs/vertex/push-artifacts-job.yaml > /tmp/vertex-push-artifacts-job.yaml
+            # Generate config file from template
+            export CONTAINER_URI_LATEST=${{ steps.container.outputs.container_uri }} \
+              BUCKET_NAME=${{ secrets.BUCKET_NAME }} \
+              KAGGLE_USERNAME=${{ secrets.KAGGLE_USERNAME }} \
+              KAGGLE_KEY=${{ secrets.KAGGLE_KEY }} \
+              KAGGLE_COMPETITION_NAME=${{ secrets.KAGGLE_COMPETITION_NAME }}
+            envsubst < configs/vertex/push-artifacts-job.yaml > /tmp/vertex-push-artifacts-job.yaml
 
-          # Create job and capture job ID
-          JOB_ID=$(gcloud ai custom-jobs create \
-            --project=${PROJECT_ID} \
-            --region=${REGION} \
-            --display-name="kaggle-push-artifacts-$(date +%Y%m%d-%H%M%S)" \
-            --config=/tmp/vertex-push-artifacts-job.yaml \
-            --format="value(name)")
+            # Create job and capture job ID
+            JOB_ID=$(gcloud ai custom-jobs create \
+              --project=${{ secrets.PROJECT_ID }} \
+              --region=${{ secrets.REGION }} \
+              --display-name="kaggle-push-artifacts-$(date +%Y%m%d-%H%M%S)" \
+              --config=/tmp/vertex-push-artifacts-job.yaml \
+              --format="value(name)")
 
-          echo "Created Vertex AI job: ${JOB_ID}"
-          echo "job_id=${JOB_ID}" >> $GITHUB_OUTPUT
+            echo "Created Vertex AI job: ${JOB_ID}"
+            echo "job_id=${JOB_ID}" >> $GITHUB_OUTPUT
 
-      - name: Wait for Artifacts Push Job
-        env:
-          PROJECT_ID: ${{ secrets.PROJECT_ID }}
-          REGION: ${{ secrets.REGION }}
-        run: |
-          echo "Waiting for Vertex AI job to complete..."
-          ./scripts/wait_for_vertex_job.sh \
-            "${{ steps.push_artifacts.outputs.job_id }}" \
-            "${PROJECT_ID}" \
-            "${REGION}"
-          sleep 60
+            # Wait for the job to complete
+            echo "Waiting for Vertex AI job to complete..."
+            ./scripts/wait_for_vertex_job.sh \
+              "${JOB_ID}" \
+              "${{ secrets.PROJECT_ID }}" \
+              "${{ secrets.REGION }}"
+            sleep 60
 
       - name: Push Code to Kaggle
         env:
