@@ -1,15 +1,14 @@
 name: Build and Push Docker Image
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize]
     paths:
       - "Dockerfile"
       - "src/**"
       - "pyproject.toml"
       - "cloudbuild.yaml"
-  workflow_dispatch:
 
 jobs:
   build-and-push:
