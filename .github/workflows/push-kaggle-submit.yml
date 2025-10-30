@@ -102,7 +102,8 @@ jobs:
               BUCKET_NAME=${{ secrets.BUCKET_NAME }} \
               KAGGLE_USERNAME=${{ secrets.KAGGLE_USERNAME }} \
               KAGGLE_KEY=${{ secrets.KAGGLE_KEY }} \
-              KAGGLE_COMPETITION_NAME=${{ secrets.KAGGLE_COMPETITION_NAME }}
+              KAGGLE_COMPETITION_NAME=${{ secrets.KAGGLE_COMPETITION_NAME }} \
+              EXP_NAMES="${{ steps.parse_exp_names.outputs.exp_names }}"
             envsubst < configs/vertex/push-artifacts-job.yaml > /tmp/vertex-push-artifacts-job.yaml
 
             # Create job and capture job ID
@@ -112,6 +113,11 @@ jobs:
               --display-name="kaggle-push-artifacts-$(date +%Y%m%d-%H%M%S)" \
               --config=/tmp/vertex-push-artifacts-job.yaml \
               --format="value(name)")
+
+            if [ -z "${JOB_ID}" ]; then
+              echo "ERROR: Failed to create Vertex AI job"
+              exit 1
+            fi
 
             echo "Created Vertex AI job: ${JOB_ID}"
             echo "job_id=${JOB_ID}" >> $GITHUB_OUTPUT
