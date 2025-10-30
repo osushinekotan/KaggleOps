@@ -1,5 +1,6 @@
 import logging
 from pathlib import Path
+from typing import Protocol
 
 import dotenv
 from kaggle import KaggleApi
@@ -19,7 +20,14 @@ client.authenticate()
 app = SubcommandApp()
 
 
-def get_directory_settings(run_env: str):
+class DirectoryConfig(Protocol):
+    """Protocol for directory configuration objects."""
+
+    ROOT_DIR: str
+    ARTIFACT_DIR: str
+
+
+def get_directory_settings(run_env: str) -> DirectoryConfig:
     """Get appropriate directory settings based on environment."""
     if run_env == "vertex":
         vertex_settings = VertexDirectorySettings()  # type: ignore
