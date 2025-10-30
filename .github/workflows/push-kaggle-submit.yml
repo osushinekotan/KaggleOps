@@ -144,7 +144,7 @@ jobs:
         env:
           KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
           KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
-          KAGGLE_COMPETITION_NAME: ${{ secrets.KAGGLE_COMPETITION_NAME }}
         run: |
+          export KAGGLE_USERNAME=${KAGGLE_USERNAME} KAGGLE_KEY=${KAGGLE_KEY}
           echo "Submitting to Kaggle..."
           cd codes/submission && kaggle k push
