@@ -141,6 +141,10 @@ jobs:
           python -m src.kaggle_ops.upload codes --settings.run-env local
 
       - name: Submit to Kaggle
+        env:
+          KAGGLE_USERNAME: ${{ secrets.KAGGLE_USERNAME }}
+          KAGGLE_KEY: ${{ secrets.KAGGLE_KEY }}
+          KAGGLE_COMPETITION_NAME: ${{ secrets.KAGGLE_COMPETITION_NAME }}
         run: |
           echo "Submitting to Kaggle..."
           cd codes/submission && kaggle k push
