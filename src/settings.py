@@ -98,7 +98,7 @@ class DirectorySettings(BaseSettings):
             self.run_env = get_run_env()
 
         if self.run_env == "local":
-            dir_setting = LocalDirectorySettings()  # type: ignore
+            dir_setting: LocalDirectorySettings = LocalDirectorySettings()  # type: ignore
             self.ROOT_DIR = Path(dir_setting.ROOT_DIR)
             self.INPUT_DIR = Path(dir_setting.INPUT_DIR)
             self.OUTPUT_DIR = Path(dir_setting.OUTPUT_DIR_TEMPLATE.format(exp_name=self.exp_name))
@@ -107,7 +107,7 @@ class DirectorySettings(BaseSettings):
             self.ARTIFACT_EXP_DIR = self.ARTIFACT_DIR / self.exp_name / "1"
 
         elif self.run_env == "kaggle":
-            dir_setting = KaggleDirectorySettings()  # type: ignore
+            dir_setting: KaggleDirectorySettings = KaggleDirectorySettings()  # type: ignore
             self.ROOT_DIR = Path(dir_setting.ROOT_DIR)
             self.INPUT_DIR = Path(dir_setting.INPUT_DIR)
             self.OUTPUT_DIR = Path(dir_setting.OUTPUT_DIR)  # type: ignore
@@ -116,12 +116,12 @@ class DirectorySettings(BaseSettings):
             self.ARTIFACT_EXP_DIR = self.ARTIFACT_DIR / self.exp_name / "1"
 
         elif self.run_env == "vertex":
-            dir_setting = VertexDirectorySettings()  # type: ignore
-            bucket = dir_setting.BUCKET_NAME
-            self.ROOT_DIR = Path(dir_setting.ROOT_DIR.format(bucket=bucket))
-            self.INPUT_DIR = Path(dir_setting.INPUT_DIR.format(bucket=bucket))
-            self.OUTPUT_DIR = Path(dir_setting.OUTPUT_DIR_TEMPLATE.format(bucket=bucket, exp_name=self.exp_name))
-            self.ARTIFACT_DIR = Path(dir_setting.ARTIFACT_DIR.format(bucket=bucket))
+            dir_setting_vertex: VertexDirectorySettings = VertexDirectorySettings()  # type: ignore
+            bucket = dir_setting_vertex.BUCKET_NAME
+            self.ROOT_DIR = Path(dir_setting_vertex.ROOT_DIR.format(bucket=bucket))
+            self.INPUT_DIR = Path(dir_setting_vertex.INPUT_DIR.format(bucket=bucket))
+            self.OUTPUT_DIR = Path(dir_setting_vertex.OUTPUT_DIR_TEMPLATE.format(bucket=bucket, exp_name=self.exp_name))
+            self.ARTIFACT_DIR = Path(dir_setting_vertex.ARTIFACT_DIR.format(bucket=bucket))
             self.COMP_DATASET_DIR = self.INPUT_DIR / self.kaggle_settings.KAGGLE_COMPETITION_NAME
             self.ARTIFACT_EXP_DIR = self.ARTIFACT_DIR / self.exp_name / "1"
 
