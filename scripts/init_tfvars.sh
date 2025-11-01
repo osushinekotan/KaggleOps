@@ -13,7 +13,7 @@ if [ -f "$ENV_FILE" ]; then
   set +a
 fi
 
-for var in PROJECT_ID REGION BUCKET_NAME; do
+for var in PROJECT_ID REGION BUCKET_NAME KAGGLE_COMPETITION_NAME; do
   if [ -z "${!var:-}" ]; then
     echo "Error: $var is not set in $ENV_FILE or environment"
     exit 1
@@ -32,11 +32,18 @@ fi
 
 echo "Detected GitHub repository: $GITHUB_REPO"
 
-cat "$TFVARS_TEMPLATE" | \
-  sed "s/YOUR_PROJECT_ID/$PROJECT_ID/g" | \
-  sed "s/YOUR_REGION/$REGION/g" | \
-  sed "s/YOUR_BUCKET_NAME/$BUCKET_NAME/g" | \
-  sed "s#YOUR_GITHUB_USERNAME/YOUR_REPO_NAME#$GITHUB_REPO#g" \
-  > "$TFVARS_OUTPUT"
+# Check if envsubst is available
+if ! command -v envsubst >/dev/null 2>&1; then
+  echo "Error: envsubst command not found. Please install gettext package:"
+  echo "  apt-get install gettext-base  # Debian/Ubuntu"
+  echo "  yum install gettext           # CentOS/RHEL"
+  exit 1
+fi
+
+# Export variables for envsubst
+export PROJECT_ID REGION BUCKET_NAME KAGGLE_COMPETITION_NAME GITHUB_REPO
+
+# Use envsubst to replace environment variables in template
+envsubst < "$TFVARS_TEMPLATE" > "$TFVARS_OUTPUT"
 
 echo "✓ Generated $TFVARS_OUTPUT"

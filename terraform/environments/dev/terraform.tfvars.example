@@ -1,9 +1,12 @@
-project_id = "YOUR_PROJECT_ID"
-region     = "YOUR_REGION"
+project_id = "${PROJECT_ID}"
+region     = "${REGION}"
 
 # GitHub repository for Workload Identity Federation
 # Format: "owner/repo" (e.g., "username/my-repo")
-github_repository = "YOUR_GITHUB_USERNAME/YOUR_REPO_NAME"
+github_repository = "${GITHUB_REPO}"
+
+# Workload Identity Pool ID (includes competition name to avoid conflicts)
+workload_identity_pool_id = "github-${KAGGLE_COMPETITION_NAME}"
 
 service_accounts = {
   vertex_ai = {
@@ -33,8 +36,8 @@ service_accounts = {
 
 gcs_buckets = {
   kaggle_competition_artifacts = {
-    name                        = "YOUR_BUCKET_NAME"
-    location                    = "YOUR_REGION"
+    name                        = "${BUCKET_NAME}"
+    location                    = "${REGION}"
     storage_class               = "STANDARD"
     versioning_enabled          = true
     uniform_bucket_level_access = true
@@ -44,7 +47,7 @@ gcs_buckets = {
 artifact_registries = {
   kaggle_competition_artifacts = {
     repository_id = "kaggle-competition-artifacts"
-    location      = "YOUR_REGION"
+    location      = "${REGION}"
     format        = "DOCKER"
   }
 }
