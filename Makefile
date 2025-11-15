@@ -8,6 +8,70 @@ CONTAINER_URI_LATEST := $(CONTAINER_URI_BASE):latest
 export CONTAINER_URI_LATEST
 export CONTAINER_URI_COMMIT
 
+# ====================================================================
+# Infrastructure Setup
+# ====================================================================
+.PHONY: auth
+auth:
+	@echo "Authenticating with Google Cloud and GitHub..."
+	gcloud auth application-default login
+	gcloud auth login
+	gh auth login
+	@echo "All authentication completed"
+
+.PHONY: init-infra
+init-infra:
+ifndef PROJECT_ID
+	$(error PROJECT_ID is not set. Please set it in .env or export it)
+endif
+ifndef REGION
+	$(error REGION is not set. Please set it in .env or export it)
+endif
+	@echo "Initializing infrastructure..."
+	@if [ ! -f .env ]; then \
+		echo "Copying .env.example to .env..."; \
+		cp .env.example .env; \
+		echo ".env file created. Please edit it with your configuration and run this command again."; \
+		exit 1; \
+	fi
+	@echo "Creating Terraform state bucket..."
+	@BUCKET_NAME=$(PROJECT_ID)-terraform-state && \
+	gsutil mb -p $(PROJECT_ID) -l $(REGION) gs://$$BUCKET_NAME || true && \
+	gsutil versioning set on gs://$$BUCKET_NAME
+	@echo "Initializing Terraform..."
+	cd terraform/environments/dev && \
+	../../../scripts/init_tfvars.sh ../../../.env && \
+	export GOOGLE_OAUTH_ACCESS_TOKEN=$$(gcloud auth application-default print-access-token) && \
+	terraform init
+	@echo "Infrastructure initialization completed"
+
+.PHONY: setup-infra
+setup-infra:
+	@echo "Setting up infrastructure with Terraform..."
+	cd terraform/environments/dev && terraform apply
+	@echo "Exporting Terraform outputs to .env..."
+	@if ! grep -q "^WIF_PROVIDER=" .env 2>/dev/null; then \
+		echo "" >> .env; \
+		echo "# Workload Identity Federation (from terraform output)" >> .env; \
+		echo "WIF_PROVIDER=$$(cd terraform/environments/dev && terraform output -raw workload_identity_provider)" >> .env; \
+		echo "WIF_SERVICE_ACCOUNT=$$(cd terraform/environments/dev && terraform output -json service_account_emails | jq -r '.github_actions')" >> .env; \
+		echo "Terraform outputs added to .env"; \
+	else \
+		echo "WIF_PROVIDER already exists in .env. Skipping output export..."; \
+		echo "If you want to update, please remove the existing WIF entries first."; \
+	fi
+	@echo "Setting up GitHub secrets..."
+	./scripts/set_github_secrets.sh
+	@echo "Infrastructure setup completed"
+
+.PHONY: tf-plan
+tf-plan:
+	@echo "Running Terraform plan..."
+	cd terraform/environments/dev && terraform plan
+
+# ====================================================================
+# Kaggle Competition Setup
+# ====================================================================
 .PHONY: setup
 setup:
 	python -m src.kaggle_ops.write submission-code
