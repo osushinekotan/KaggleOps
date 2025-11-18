@@ -69,6 +69,11 @@ tf-plan:
 	@echo "Running Terraform plan..."
 	cd terraform/environments/dev && terraform plan
 
+.PHONY: tf-destroy
+tf-destroy:
+	@echo "Destroying infrastructure with Terraform..."
+	cd terraform/environments/dev && terraform destroy
+
 # ====================================================================
 # Kaggle Competition Setup
 # ====================================================================
