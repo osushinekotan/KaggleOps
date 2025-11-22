@@ -269,7 +269,7 @@ endif
 	@echo "Submitting build to Cloud Build..."
 	gcloud builds submit \
 		--config=cloudbuild.yaml \
-		--timeout=1h \
+		--timeout=2h \
 		--substitutions=_REGION=$(REGION),_KAGGLE_COMPETITION_NAME=$(KAGGLE_COMPETITION_NAME),SHORT_SHA=$(GIT_COMMIT) \
 		--project=$(PROJECT_ID)
 	@echo "Cloud Build completed"
