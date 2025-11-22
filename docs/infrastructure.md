@@ -66,3 +66,13 @@ make setup-infra
 - データストレージ用 GCS バケット
 - Docker イメージ用 Artifact Registry
 - GitHub Actions 用 Workload Identity Pool と Provider
+
+### 5. Docker イメージの GAR へのプッシュ
+
+```bash
+make push-image
+```
+
+- Cloud Build を使用した Docker イメージのビルド
+- Google Artifact Registry (GAR) へのイメージプッシュ
+- vertex custom training job, Github Actions で使用
