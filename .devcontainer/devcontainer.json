@@ -5,7 +5,7 @@
   "containerEnv": {
     "TZ": "Asia/Tokyo",
     "UV_PROJECT_ENVIRONMENT": "/usr/local/",
-    "CLOUDSDK_CONFIG": "$HOME/.config/gcloud"
+    "CLOUDSDK_CONFIG": "/root/.config/gcloud"
   },
   "remoteEnv": {
     "PYTHONPATH": "/workspace:${PYTHONPATH}"
