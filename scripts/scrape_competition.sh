@@ -22,6 +22,7 @@ COMPETITION_NAME_LOWER=$(echo "$KAGGLE_COMPETITION_NAME" | tr '[:upper:]' '[:low
 # Create docs directory
 DOCS_DIR="docs/$KAGGLE_COMPETITION_NAME"
 mkdir -p "$DOCS_DIR"
+echo "*" > "$DOCS_DIR/.gitignore"
 
 echo "📂 Created directory: $DOCS_DIR"
 echo "🏆 Competition: $KAGGLE_COMPETITION_NAME"

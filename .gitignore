@@ -167,7 +167,3 @@ data/input/*
 !data/input/.gitkeep
 data/output/*
 !data/output/.gitkeep
-
-docs/*
-!docs/.gitkeep
-!docs/0*
