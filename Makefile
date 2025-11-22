@@ -83,7 +83,7 @@ setup:
 	./scripts/scrape_competition.sh
 	python -m src.kaggle_ops.write submission-metadata
 	python -m src.kaggle_ops.write deps-metadata
-	python -m src.kaggle_ops.write deps-code
+	$(MAKE) push-deps
 	@echo "Setup completed"
 
 .PHONY: dl-comp
