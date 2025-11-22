@@ -79,18 +79,18 @@ class DirectorySettings(BaseSettings):
     """
 
     exp_name: str = Field(..., description="Experiment name for the output directory.")
-    run_env: str | None = Field(None, description="Environment type, either 'local' or 'kaggle' or 'vertex'.")
+    run_env: str | None = Field(default=None, description="Environment type, either 'local' or 'kaggle' or 'vertex'.")
     kaggle_settings: KaggleSettings = Field(
-        KaggleSettings(),  # type: ignore
+        default=KaggleSettings(),
         description="Kaggle settings for the download process.",
     )
 
-    COMP_DATASET_DIR: str | Path = Field("", description="Directory for Kaggle competition datasets.")
-    ROOT_DIR: str | Path = Field("", description="Root directory of the project.")
-    INPUT_DIR: str | Path = Field("", description="Input directory for datasets.")
-    OUTPUT_DIR: str | Path = Field("", description="Output directory for artifacts.")
-    ARTIFACT_DIR: str | Path = Field("", description="Directory for artifacts.")
-    ARTIFACT_EXP_DIR: str | Path = Field("", description="Directory for experiment artifacts.")
+    COMP_DATASET_DIR: Path = Field(default="", description="Directory for Kaggle competition datasets.")  # type: ignore
+    ROOT_DIR: Path = Field(default="", description="Root directory of the project.")  # type: ignore
+    INPUT_DIR: Path = Field(default="", description="Input directory for datasets.")  # type: ignore
+    OUTPUT_DIR: Path = Field(default="", description="Output directory for artifacts.")  # type: ignore
+    ARTIFACT_DIR: Path = Field(default="", description="Directory for artifacts.")  # type: ignore
+    ARTIFACT_EXP_DIR: Path = Field(default="", description="Directory for experiment artifacts.")  # type: ignore
 
     @model_validator(mode="after")
     def set_directories(self) -> "DirectorySettings":
